@@ -6,15 +6,17 @@ function App() {
   const [hoveredButton, setHoveredButton] = useState(null)
   const [selectedButton, setSelectedButton] = useState(null)
 
-  const [button, setButton] = useState(null)
-  const [dot, setDot] = useState(null)
+  const [buttons, setButton] = useState([])
+  const [dots, setDot] = useState([])
 
   return (
     <>
       <div id="navbar" className="">
         <CameraGroup label="Cubes" setButton={setButton} setDot={setDot} />
         <div id="buttons" className="flex items-center justify-center p-4 space-x-4">
-          <div>{button}</div>
+          {buttons.map((button) => (
+            <>{button}</>
+          ))}
           {/* <button
             id="cube_button"
             onMouseEnter={() => setHoveredButton('cube')}
@@ -46,7 +48,9 @@ function App() {
 
         <div id="dot_stack" className="absolute top-0 right-0 h-screen flex flex-col justify-center items-center p-4">
           <div className="flex flex-col space-y-4">
-            {dot}
+            {dots.map((dot) => (
+              <>{dot}</>
+            ))}
             
             {/* <span
               id="cube_dot"
