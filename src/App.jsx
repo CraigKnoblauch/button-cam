@@ -3,6 +3,7 @@ import { useState } from 'react'
 
 function App() {
   const [hoveredButton, setHoveredButton] = useState(null)
+  const [selectedButton, setSelectedButton] = useState(null)
 
   return (
     <>
@@ -12,7 +13,8 @@ function App() {
             id="cube_button"
             onMouseEnter={() => setHoveredButton('cube')}
             onMouseLeave={() => setHoveredButton(null)}
-            style={{ backgroundColor: hoveredButton === 'cube' ? 'blue' : 'initial' }}
+            onClick={() => setSelectedButton('cube')}
+            style={{ backgroundColor: hoveredButton === 'cube' || selectedButton === 'cube' ? 'green' : 'initial' }}
           >
             Cubes
           </button>
@@ -20,7 +22,8 @@ function App() {
             id="sphere_button"
             onMouseEnter={() => setHoveredButton('sphere')}
             onMouseLeave={() => setHoveredButton(null)}
-            style={{ backgroundColor: hoveredButton === 'sphere' ? 'blue' : 'initial' }}
+            onClick={() => setSelectedButton('sphere')}
+            style={{ backgroundColor: hoveredButton === 'sphere' || selectedButton === 'sphere' ? 'green' : 'initial' }}
           >
             Spheres
           </button>
@@ -28,7 +31,8 @@ function App() {
             id="pyramid_button"
             onMouseEnter={() => setHoveredButton('pyramid')}
             onMouseLeave={() => setHoveredButton(null)}
-            style={{ backgroundColor: hoveredButton === 'pyramid' ? 'blue' : 'initial' }}
+            onClick={() => setSelectedButton('pyramid')}
+            style={{ backgroundColor: hoveredButton === 'pyramid' || selectedButton === 'pyramid' ? 'green' : 'initial' }}
           >
             Pyramids
           </button>
@@ -39,17 +43,17 @@ function App() {
             <span
               id="cube_dot"
               className="w-2 h-2 bg-gray-500 rounded-full"
-              style={{ backgroundColor: hoveredButton === 'cube' ? 'blue' : 'gray' }}
+              style={{ backgroundColor: selectedButton === 'cube' ? 'green' : 'gray' }}
             ></span>
             <span
               id="sphere_dot"
               className="w-2 h-2 bg-gray-500 rounded-full"
-              style={{ backgroundColor: hoveredButton === 'sphere' ? 'blue' : 'gray' }}
+              style={{ backgroundColor: selectedButton === 'sphere' ? 'green' : 'gray' }}
             ></span>
             <span
               id="pyramid_dot"
               className="w-2 h-2 bg-gray-500 rounded-full"
-              style={{ backgroundColor: hoveredButton === 'pyramid' ? 'blue' : 'gray' }}
+              style={{ backgroundColor: selectedButton === 'pyramid' ? 'green' : 'gray' }}
             ></span>
           </div>
         </div>
