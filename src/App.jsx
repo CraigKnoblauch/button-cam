@@ -1,25 +1,16 @@
-import { useEffect } from 'react';
-import { BrowserRouter } from "react-router-dom";
-import { Navbar } from "src/components/Navbar";
+import { useState } from 'react'
+import reactLogo from './assets/react.svg'
+import viteLogo from '/vite.svg'
+import './App.css'
 
-const App = () => {
+function App() {
+  const [count, setCount] = useState(0)
 
   return (
-    <BrowserRouter>
-      <div className='relative z-0 bg-primary'>
-        <Navbar />
-          <div id="portfolio" className='relative z-30 bg-primary mt-[-2px]'>
-            <Portfolio />
-          </div>
-          <div id="experience" className='relative z-30 bg-primary'>
-            <Experience />
-          </div>
-          <div id="contact" className='relative z-30 bg-primary'>
-            <Contact />
-          </div>
-      </div>
-    </BrowserRouter>
-  );
-};
+    <>
+      <h1 className="text-3xl font-bold underline">Hello World</h1>
+    </>
+  )
+}
 
-export default App;
+export default App
