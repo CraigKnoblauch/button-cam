@@ -6,3 +6,8 @@ The buttons also correspond to a group of 3d models. I specify that because of t
 - When focus is on this component, there's a soft white color on the button and the dot
 - when this component is not in focus, there's a translucent soft white color on the button and the dot 
 - Scrolling advances to the next component
+
+# CSS Responsive design
+small screens `sm:` typically mean phones. **But you don't have to use it for mobile phones settings in Tailwind. Tailwind is mobile first**
+medium screens `md:` typically mean tablets
+large screens `lg:` typically means desktops and above
