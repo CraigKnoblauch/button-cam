@@ -11,3 +11,48 @@ The buttons also correspond to a group of 3d models. I specify that because of t
 small screens `sm:` typically mean phones. **But you don't have to use it for mobile phones settings in Tailwind. Tailwind is mobile first**
 medium screens `md:` typically mean tablets
 large screens `lg:` typically means desktops and above
+
+# Grouping a button and a dot
+The buttons and the dots are in two distinct divs because they occupy different portions of the page. They share state though. When a button is active the dot is also active. It makes sense then to have one component responsible for both of them.
+
+Here's an idea for using state and passing change state functions as props:
+```js
+// MyComponent.js
+import React from "react";
+
+const MyComponent = ({ setElement1, setElement2 }) => {
+  return (
+    <>
+      <button onClick={() => setElement1(<p>Element 1</p>)}>
+        Set Element 1
+      </button>
+      <button onClick={() => setElement2(<p>Element 2</p>)}>
+        Set Element 2
+      </button>
+    </>
+  );
+};
+
+// ParentComponent.js
+import React, { useState } from "react";
+import MyComponent from "./MyComponent";
+
+const ParentComponent = () => {
+  const [element1, setElement1] = useState(null);
+  const [element2, setElement2] = useState(null);
+
+  return (
+    <>
+      <MyComponent setElement1={setElement1} setElement2={setElement2} />
+      <div>{element1}</div>
+      <div>{element2}</div>
+    </>
+  );
+};
+
+export default ParentComponent;
+```
+
+Alternatively, there could be an `activeIndex` that gets shared between two distinct components. More fragile sure, but does it really matter at this scale?
+
+

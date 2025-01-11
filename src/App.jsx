@@ -1,15 +1,21 @@
 import { useState } from 'react'
+import CameraGroup from 'src/components/CameraGroup'
 // import './App.css'
 
 function App() {
   const [hoveredButton, setHoveredButton] = useState(null)
   const [selectedButton, setSelectedButton] = useState(null)
 
+  const [button, setButton] = useState(null)
+  const [dot, setDot] = useState(null)
+
   return (
     <>
       <div id="navbar" className="">
+        <CameraGroup label="Cubes" setButton={setButton} setDot={setDot} />
         <div id="buttons" className="flex items-center justify-center p-4 space-x-4">
-          <button
+          <div>{button}</div>
+          {/* <button
             id="cube_button"
             onMouseEnter={() => setHoveredButton('cube')}
             onMouseLeave={() => setHoveredButton(null)}
@@ -35,12 +41,14 @@ function App() {
             style={{ backgroundColor: hoveredButton === 'pyramid' || selectedButton === 'pyramid' ? 'green' : 'initial' }}
           >
             Pyramids
-          </button>
+          </button> */}
         </div>
 
         <div id="dot_stack" className="absolute top-0 right-0 h-screen flex flex-col justify-center items-center p-4">
           <div className="flex flex-col space-y-4">
-            <span
+            {dot}
+            
+            {/* <span
               id="cube_dot"
               className="w-2 h-2 bg-gray-500 rounded-full"
               style={{ backgroundColor: selectedButton === 'cube' ? 'green' : 'gray' }}
@@ -54,7 +62,7 @@ function App() {
               id="pyramid_dot"
               className="w-2 h-2 bg-gray-500 rounded-full"
               style={{ backgroundColor: selectedButton === 'pyramid' ? 'green' : 'gray' }}
-            ></span>
+            ></span> */}
           </div>
         </div>
       </div>
