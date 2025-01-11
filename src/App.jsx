@@ -13,6 +13,8 @@ function App() {
     <>
       <div id="navbar" className="">
         <CameraGroup label="Cubes" setButton={setButton} setDot={setDot} />
+        <CameraGroup label="Spheres" setButton={setButton} setDot={setDot} />
+        <CameraGroup label="Pyramids" setButton={setButton} setDot={setDot} />
         <div id="buttons" className="flex items-center justify-center p-4 space-x-4">
           {buttons.map((button) => (
             <>{button}</>

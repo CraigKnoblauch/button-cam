@@ -4,7 +4,7 @@ const CameraGroup = ({ label, setButton, setDot }) => {
     
     useEffect(() => {
         const button = <button
-            key={label}
+            key={label + "_button"}
             id={label}
             onMouseEnter={() => console.log("Mouse entered " + label)}
             onMouseLeave={() => console.log("Mouse left " + label)}
@@ -20,8 +20,19 @@ const CameraGroup = ({ label, setButton, setDot }) => {
             style={{ backgroundColor: 'gray' }}
         ></span>
 
-        setButton(buttons => [...buttons, button] );
-        setDot(dots => [...dots, dot] );
+        // Check to make sure this button or dot doesn't already exist
+        setButton(buttons => {
+            if (!buttons.some(b => b.key === button.key)) {
+                return [...buttons, button];
+            }
+            return buttons;
+        });
+        setDot(dots => {
+            if (!dots.some(d => d.key === dot.key)) {
+                return [...dots, dot];
+            }
+            return dots;
+        });
 
     }, [label, setButton, setDot])
 
