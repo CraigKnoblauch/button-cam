@@ -19,8 +19,15 @@ function App() {
           </button>
         </div>
 
-        <div id="dot_stack">
-          {/* TODO */}
+        <div id="dot_stack" className="absolute top-0 right-0 h-screen flex flex-col justify-center items-center p-4">
+          <div className="flex flex-col space-y-4">
+            <span className="w-2 h-2 bg-gray-500 rounded-full"></span>
+            <span className="w-2 h-2 bg-gray-500 rounded-full"></span>
+            <span className="w-2 h-2 bg-gray-500 rounded-full"></span>
+          </div>
+          {/* <div id="cube_dot" />
+          <div id="sphere dot" />
+          <div id="pyramid_dot" /> */}
         </div>
       </div>
     </>
