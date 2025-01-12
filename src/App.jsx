@@ -6,18 +6,18 @@ function App() {
   const [hoveredButton, setHoveredButton] = useState(null)
   const [selectedButton, setSelectedButton] = useState(null)
 
-  const [buttons, setButton] = useState([])
-  const [dots, setDot] = useState([])
+  const [buttons, appendButton] = useState([])
+  const [dots, appendDot] = useState([])
 
   return (
     <>
       <div id="navbar" className="">
-        <CameraGroup label="Cubes" setButton={setButton} setDot={setDot} />
-        <CameraGroup label="Spheres" setButton={setButton} setDot={setDot} />
-        <CameraGroup label="Pyramids" setButton={setButton} setDot={setDot} />
+        <CameraGroup label="Cubes" appendButton={appendButton} appendDot={appendDot} />
+        <CameraGroup label="Spheres" appendButton={appendButton} appendDot={appendDot} />
+        <CameraGroup label="Pyramids" appendButton={appendButton} appendDot={appendDot} />
         <div id="buttons" className="flex items-center justify-center p-4 space-x-4">
-          {buttons.map((button) => (
-            <>{button}</>
+          {buttons.map((button, index) => (
+            <span key={index}>{button}</span>
           ))}
           {/* <button
             id="cube_button"
