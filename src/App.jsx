@@ -1,4 +1,6 @@
 import { useButtonStore } from 'src/stores/ButtonStore'
+import { Canvas } from '@react-three/fiber'
+import Scene from 'src/components/Scene'
 // import './App.css'
 
 function App() {
@@ -10,6 +12,10 @@ function App() {
 
   return (
     <>
+      <Canvas>
+        <ambientLight/>
+        <Scene/>
+      </Canvas>
       <div id="navbar" className="">
         <div id="buttons" className="flex items-center justify-center p-4 space-x-4">
           <button
