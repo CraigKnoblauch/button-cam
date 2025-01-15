@@ -1,5 +1,6 @@
 import { useButtonStore } from 'src/stores/ButtonStore'
 import { Canvas } from '@react-three/fiber'
+import { OrbitControls } from '@react-three/drei'
 import Scene from 'src/components/Scene'
 // import './App.css'
 
@@ -12,11 +13,7 @@ function App() {
 
   return (
     <>
-      <Canvas>
-        <ambientLight/>
-        <Scene/>
-      </Canvas>
-      <div id="navbar" className="">
+      <div id="navbar">
         <div id="buttons" className="flex items-center justify-center p-4 space-x-4">
           <button
             id="cube_button"
@@ -44,7 +41,7 @@ function App() {
           </button>
         </div>
 
-        <div id="dot_stack" className="absolute top-0 right-0 h-screen flex flex-col justify-center items-center p-4">
+        <div id="dot_stack" className="absolute z-10 top-0 right-0 h-screen flex flex-col justify-center items-center p-4">
           <div className="flex flex-col space-y-4">
             <span
               id="cube_dot"
@@ -63,6 +60,13 @@ function App() {
             ></span>
           </div>
         </div>
+      </div>
+      <div className="h-screen z-0">
+        <Canvas>
+          <OrbitControls/>
+          <ambientLight/>
+          <Scene/>
+        </Canvas>
       </div>
     </>
   )
