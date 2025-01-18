@@ -61,7 +61,7 @@ I've been having a lot of issues trying to share the state between the button gr
 # Camera switching
 There are primary camera postions for each group of models. The camera position, rotation, fov, etc can be copied from the destination camera object. The primary camera positions are where the camera goes when the user clicks the corresponding button. The secondary camera postions are sought by scroll. Scroll views all cameras as a list. It doesn't care about primary or secondary cameras. The camera also needs to follow the camera path when it switches cameras.
 
-- [ ] Button clicks switch camera to primary camera postions
+- [x] Button clicks switch camera to primary camera postions
 - [ ] Scroll wheel switches camera to next/previous camera in list 
 - [ ] Camera switches follow a path
 
