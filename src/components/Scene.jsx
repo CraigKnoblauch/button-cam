@@ -1,5 +1,8 @@
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
+import { useButtonStore } from "src/stores/ButtonStore";
+import { useThree } from "@react-three/fiber";
+import { useEffect, useRef } from "react";
 
 const Scene = () => {
     const { scene } = useGLTF("./models/scene.glb");
@@ -22,27 +25,47 @@ const Scene = () => {
       const c2 = findModelByName("cube001");
       const c3 = findModelByName("cube002");
 
+      const c1Ref = useRef()
+
       const s1 = findModelByName("sphere");
       const s2 = findModelByName("sphere001");
       const s3 = findModelByName("sphere002");
+
+      const s1Ref = useRef()
 
       const p1 = findModelByName("pyramid");
       const p2 = findModelByName("pyramid001");
       const p3 = findModelByName("pyramid002");
 
-      const model = scene.children[1];
+      const p1Ref = useRef()
+
+      const { cube_button_active, sphere_button_active, pyramid_button_active } = useButtonStore()
+      const { camera } = useThree()
+
+      useEffect(() => {
+        console.log("Start cam position: ", camera.position)
+        if (cube_button_active) {
+          console.log("Cube ref position: ", c1Ref.current.position)
+        } else if (sphere_button_active) {
+          console.log("Sphere ref position: ", s1Ref.current.position)
+        } else if (pyramid_button_active) {
+          console.log("Pyramid ref position: ", p1Ref.current.position)
+        }
+      }, [cube_button_active, sphere_button_active, pyramid_button_active])
 
       return <>
-        <mesh geometry={ground.geometry} material={new THREE.MeshStandardMaterial({ color: 0x877763 })} position={new THREE.Vector3(ground.position.x, ground.position.y - 1, ground.position.z)} rotation={ground.rotation} />
-        <mesh geometry={c1.geometry} material={new THREE.MeshStandardMaterial({ color: 0xff0000 })} position={c1.position} rotation={c1.rotation} />
-        <mesh geometry={c2.geometry} material={new THREE.MeshStandardMaterial({ color: 0xff0000 })} position={c2.position} rotation={c2.rotation} />
-        <mesh geometry={c3.geometry} material={new THREE.MeshStandardMaterial({ color: 0xff0000 })} position={c3.position} rotation={c3.rotation} />
-        <mesh geometry={s1.geometry} material={new THREE.MeshStandardMaterial({ color: 0x00ff00 })} position={s1.position} rotation={s1.rotation} />
-        <mesh geometry={s2.geometry} material={new THREE.MeshStandardMaterial({ color: 0x00ff00 })} position={s2.position} rotation={s2.rotation} />
-        <mesh geometry={s3.geometry} material={new THREE.MeshStandardMaterial({ color: 0x00ff00 })} position={s3.position} rotation={s3.rotation} />
-        <mesh geometry={p1.geometry} material={new THREE.MeshStandardMaterial({ color: 0x0000ff })} position={p1.position} rotation={p1.rotation} />
-        <mesh geometry={p2.geometry} material={new THREE.MeshStandardMaterial({ color: 0x0000ff })} position={p2.position} rotation={p2.rotation} />
-        <mesh geometry={p3.geometry} material={new THREE.MeshStandardMaterial({ color: 0x0000ff })} position={p3.position} rotation={p3.rotation} />
+        <primitive object={ground} material={new THREE.MeshStandardMaterial({ color: 0x877763 })} />
+        <primitive object={c1} ref={c1Ref} material={new THREE.MeshStandardMaterial({ color: 0xff0000 })}/>
+        <primitive object={c2} material={new THREE.MeshStandardMaterial({ color: 0xff0000 })}/>
+        <primitive object={c3} material={new THREE.MeshStandardMaterial({ color: 0xff0000 })}/>
+
+        <primitive object={s1} ref={s1Ref} material={new THREE.MeshStandardMaterial({ color: 0x00ff00 })}/>
+        <primitive object={s2} material={new THREE.MeshStandardMaterial({ color: 0x00ff00 })}/>
+        <primitive object={s3} material={new THREE.MeshStandardMaterial({ color: 0x00ff00 })}/>
+
+        <primitive object={p1} ref={p1Ref} material={new THREE.MeshStandardMaterial({ color: 0x0000ff })}/>
+        <primitive object={p2} material={new THREE.MeshStandardMaterial({ color: 0x0000ff })}/>
+        <primitive object={p3} material={new THREE.MeshStandardMaterial({ color: 0x0000ff })}/>
       </>
 }
 

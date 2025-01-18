@@ -57,3 +57,13 @@ Alternatively, there could be an `activeIndex` that gets shared between two dist
 
 # Global state
 I've been having a lot of issues trying to share the state between the button group and the dot stack. Got recommended to try having a global state. So use zustand, have a store that contains the selected state, then drive the button styles off of that. Might also be good when I put in camera control logic because I will be able to pull from the store what scene I'm going to.
+
+# Camera switching
+There are primary camera postions for each group of models. The camera position, rotation, fov, etc can be copied from the destination camera object. The primary camera positions are where the camera goes when the user clicks the corresponding button. The secondary camera postions are sought by scroll. Scroll views all cameras as a list. It doesn't care about primary or secondary cameras. The camera also needs to follow the camera path when it switches cameras.
+
+- [ ] Button clicks switch camera to primary camera postions
+- [ ] Scroll wheel switches camera to next/previous camera in list 
+- [ ] Camera switches follow a path
+
+# Transforms in Blender
+Make sure to only apply transformations on rotation and scale. Otherwise the origin of all objects gets set to the center. And thus the position of all objects will seem to be the center.
