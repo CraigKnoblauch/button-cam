@@ -1,7 +1,7 @@
-import { useGLTF } from "@react-three/drei";
+import { useGLTF, useScroll } from "@react-three/drei";
 import * as THREE from "three";
 import { useButtonStore } from "src/stores/ButtonStore";
-import { useThree } from "@react-three/fiber";
+import { useThree, useFrame } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
 
 const Scene = () => {
@@ -75,13 +75,37 @@ const Scene = () => {
       const sceneCams = [c1cam, c2cam, c3cam, s1cam, s2cam, s3cam, p1cam, p2cam, p3cam]
       const sceneCamsIndexRef = useRef(0)
 
-      const { cube_button_active, sphere_button_active, pyramid_button_active } = useButtonStore()
+      const { 
+        cube_button_active, sphere_button_active, pyramid_button_active,
+        setCubeButton, setSphereButton, setPyramidButton
+      } = useButtonStore()
+
       const { camera } = useThree()
+      const scroll = useScroll()
+
+      useFrame((state, delta) => {
+
+        // const { cube_button_active, sphere_button_active, pyramid_button_active } = useButtonStore()
+
+        if(scroll.visible(0, 1/3)) {
+          if (!cube_button_active) { setCubeButton() }
+        } else if(scroll.visible(1/3, 1/3)) {
+          if (!sphere_button_active) { setSphereButton() }
+        } else if(scroll.visible(2/3, 1/3)) {
+          if (!pyramid_button_active) { setPyramidButton() }
+        }
+      })
 
       useEffect(() => {
         console.log("Start cam position: ", camera.position)
         if (cube_button_active) {
 
+          // NOTE: The scrollTo setting doesn't take until after the frame where it is set passes.
+          // This is why is set both the offset and the scrollTo. The manual offset setting will be evaluated
+          // in this frame, and then the underlying drei logic will correct the offset to something
+          // close to what I set here.
+          scroll.offset = 0 + 0.01
+          scroll.el.scrollTo(0, 0);
           const primaryCubeCam = sceneCams.find(cam => cam.group === "cubes" && cam.isPrimary);
           sceneCamsIndexRef.current = sceneCams.findIndex(cam => cam.group === "cubes" && cam.isPrimary);
           camera.position.set(primaryCubeCam.cam.position.x, primaryCubeCam.cam.position.y, primaryCubeCam.cam.position.z)
@@ -89,6 +113,8 @@ const Scene = () => {
 
         } else if (sphere_button_active) {
 
+          scroll.offset = 1/3 + 0.01
+          scroll.el.scrollTo(0, (document.body.scrollHeight / 3)+1);
           const primarySphereCam = sceneCams.find(cam => cam.group === "spheres" && cam.isPrimary);
           sceneCamsIndexRef.current = sceneCams.findIndex(cam => cam.group === "spheres" && cam.isPrimary);
           camera.position.set(primarySphereCam.cam.position.x, primarySphereCam.cam.position.y, primarySphereCam.cam.position.z)
@@ -96,6 +122,8 @@ const Scene = () => {
 
         } else if (pyramid_button_active) {
 
+          scroll.offset = 2/3 + 0.01
+          scroll.el.scrollTo(0, (document.body.scrollHeight / 3)*2+1);
           const primaryPyramidCam = sceneCams.find(cam => cam.group === "pyramids" && cam.isPrimary);
           sceneCamsIndexRef.current = sceneCams.findIndex(cam => cam.group === "pyramids" && cam.isPrimary);
           camera.position.set(primaryPyramidCam.cam.position.x, primaryPyramidCam.cam.position.y, primaryPyramidCam.cam.position.z)
@@ -104,7 +132,8 @@ const Scene = () => {
         }
         console.log("Camera position: ", camera.position)
         console.log("Camera rotation: ", camera.rotation)
-      }, [cube_button_active, sphere_button_active, pyramid_button_active])
+        console.log("Scroll: ", scroll)
+      }, [cube_button_active, sphere_button_active, pyramid_button_active, scroll])
 
       return <>
         <primitive object={ground} material={new THREE.MeshStandardMaterial({ color: 0x877763 })} />
