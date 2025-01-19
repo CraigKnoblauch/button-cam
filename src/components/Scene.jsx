@@ -22,31 +22,58 @@ const Scene = () => {
       const ground = findModelByName("ground");
       
       const c1 = findModelByName("cube");
-      const c1cam = findModelByName("primary_cube_cam");
       const c2 = findModelByName("cube001");
-      const c2cam = findModelByName("cube_cam_2");
       const c3 = findModelByName("cube002");
-      const c3cam = findModelByName("cube_cam_3");
 
       const c1Ref = useRef()
+      const c2Ref = useRef()
+      const c3Ref = useRef()
 
       const s1 = findModelByName("sphere");
-      const s1cam = findModelByName("primary_sphere_cam");
       const s2 = findModelByName("sphere001");
-      const s2cam = findModelByName("sphere_cam_2");
       const s3 = findModelByName("sphere002");
-      const s3cam = findModelByName("sphere_cam_3");
 
       const s1Ref = useRef()
+      const s2Ref = useRef()
+      const s3Ref = useRef()
 
       const p1 = findModelByName("pyramid");
-      const p1cam = findModelByName("primary_pyramid_cam");
       const p2 = findModelByName("pyramid001");
-      const p2cam = findModelByName("pyramid_cam_2");
       const p3 = findModelByName("pyramid002");
-      const p3cam = findModelByName("pyramid_cam_3");
 
       const p1Ref = useRef()
+      const p2Ref = useRef()
+      const p3Ref = useRef()
+
+      /**
+       * For each camera position I need to know,
+       * 1. The position of the camera
+       * 2. The rotation of the camera
+       * 3. The target of the camera
+       * 4. The next camera
+       * 5. The previous camera
+       */
+      class SceneCam {
+        constructor(cam, target, isPrimary, group) {
+          this.cam = cam;
+          this.target = target;
+          this.isPrimary = isPrimary;
+          this.group = group;
+        }
+      }
+
+      const c1cam = new SceneCam(findModelByName("primary_cube_cam"), c1Ref, true, "cubes");
+      const c2cam = new SceneCam(findModelByName("cube_cam_2"), c2Ref, false, "cubes");
+      const c3cam = new SceneCam(findModelByName("cube_cam_3"), c3Ref, false, "cubes");
+      const s1cam = new SceneCam(findModelByName("primary_sphere_cam"), s1Ref, true, "spheres");
+      const s2cam = new SceneCam(findModelByName("sphere_cam_2"), s2Ref, false, "spheres");
+      const s3cam = new SceneCam(findModelByName("sphere_cam_3"), s3Ref, false, "spheres");
+      const p1cam = new SceneCam(findModelByName("primary_pyramid_cam"), p1Ref, true, "pyramids");
+      const p2cam = new SceneCam(findModelByName("pyramid_cam_2"), p2Ref, false, "pyramids");
+      const p3cam = new SceneCam(findModelByName("pyramid_cam_3"), p3Ref, false, "pyramids");
+
+      const sceneCams = [c1cam, c2cam, c3cam, s1cam, s2cam, s3cam, p1cam, p2cam, p3cam]
+      const sceneCamsIndexRef = useRef(0)
 
       const { cube_button_active, sphere_button_active, pyramid_button_active } = useButtonStore()
       const { camera } = useThree()
@@ -54,17 +81,26 @@ const Scene = () => {
       useEffect(() => {
         console.log("Start cam position: ", camera.position)
         if (cube_button_active) {
-          console.log("Cube ref position: ", c1Ref.current.position)
-          camera.position.set(c1cam.position.x, c1cam.position.y, c1cam.position.z)
-          camera.rotation.set(c1cam.rotation.x, c1cam.rotation.y, c1cam.rotation.z)
+
+          const primaryCubeCam = sceneCams.find(cam => cam.group === "cubes" && cam.isPrimary);
+          sceneCamsIndexRef.current = sceneCams.findIndex(cam => cam.group === "cubes" && cam.isPrimary);
+          camera.position.set(primaryCubeCam.cam.position.x, primaryCubeCam.cam.position.y, primaryCubeCam.cam.position.z)
+          camera.rotation.set(primaryCubeCam.cam.rotation.x, primaryCubeCam.cam.rotation.y, primaryCubeCam.cam.rotation.z)
+
         } else if (sphere_button_active) {
-          console.log("Sphere ref position: ", s1Ref.current.position)
-          camera.position.set(s1cam.position.x, s1cam.position.y, s1cam.position.z)
-          camera.rotation.set(s1cam.rotation.x, s1cam.rotation.y, s1cam.rotation.z)
+
+          const primarySphereCam = sceneCams.find(cam => cam.group === "spheres" && cam.isPrimary);
+          sceneCamsIndexRef.current = sceneCams.findIndex(cam => cam.group === "spheres" && cam.isPrimary);
+          camera.position.set(primarySphereCam.cam.position.x, primarySphereCam.cam.position.y, primarySphereCam.cam.position.z)
+          camera.rotation.set(primarySphereCam.cam.rotation.x, primarySphereCam.cam.rotation.y, primarySphereCam.cam.rotation.z)
+
         } else if (pyramid_button_active) {
-          console.log("Pyramid ref position: ", p1Ref.current.position)
-          camera.position.set(p1cam.position.x, p1cam.position.y, p1cam.position.z)
-          camera.rotation.set(p1cam.rotation.x, p1cam.rotation.y, p1cam.rotation.z)
+
+          const primaryPyramidCam = sceneCams.find(cam => cam.group === "pyramids" && cam.isPrimary);
+          sceneCamsIndexRef.current = sceneCams.findIndex(cam => cam.group === "pyramids" && cam.isPrimary);
+          camera.position.set(primaryPyramidCam.cam.position.x, primaryPyramidCam.cam.position.y, primaryPyramidCam.cam.position.z)
+          camera.rotation.set(primaryPyramidCam.cam.rotation.x, primaryPyramidCam.cam.rotation.y, primaryPyramidCam.cam.rotation.z)
+
         }
         console.log("Camera position: ", camera.position)
         console.log("Camera rotation: ", camera.rotation)
@@ -73,17 +109,19 @@ const Scene = () => {
       return <>
         <primitive object={ground} material={new THREE.MeshStandardMaterial({ color: 0x877763 })} />
         <primitive object={c1} ref={c1Ref} material={new THREE.MeshStandardMaterial({ color: 0xff0000 })}/>
-        <primitive object={c2} material={new THREE.MeshStandardMaterial({ color: 0xff0000 })}/>
-        <primitive object={c3} material={new THREE.MeshStandardMaterial({ color: 0xff0000 })}/>
+        <primitive object={c2} ref={c2Ref} material={new THREE.MeshStandardMaterial({ color: 0xff0000 })}/>
+        <primitive object={c3} ref={c3Ref} material={new THREE.MeshStandardMaterial({ color: 0xff0000 })}/>
 
         <primitive object={s1} ref={s1Ref} material={new THREE.MeshStandardMaterial({ color: 0x00ff00 })}/>
-        <primitive object={s2} material={new THREE.MeshStandardMaterial({ color: 0x00ff00 })}/>
-        <primitive object={s3} material={new THREE.MeshStandardMaterial({ color: 0x00ff00 })}/>
+        <primitive object={s2} ref={s2Ref} material={new THREE.MeshStandardMaterial({ color: 0x00ff00 })}/>
+        <primitive object={s3} ref={s3Ref} material={new THREE.MeshStandardMaterial({ color: 0x00ff00 })}/>
 
         <primitive object={p1} ref={p1Ref} material={new THREE.MeshStandardMaterial({ color: 0x0000ff })}/>
-        <primitive object={p2} material={new THREE.MeshStandardMaterial({ color: 0x0000ff })}/>
-        <primitive object={p3} material={new THREE.MeshStandardMaterial({ color: 0x0000ff })}/>
+        <primitive object={p2} ref={p2Ref} material={new THREE.MeshStandardMaterial({ color: 0x0000ff })}/>
+        <primitive object={p3} ref={p3Ref} material={new THREE.MeshStandardMaterial({ color: 0x0000ff })}/>
       </>
 }
 
 export default Scene
+
+useGLTF.preload("./models/scene.glb");
