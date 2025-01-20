@@ -12,7 +12,7 @@ function App() {
   } = useButtonStore()
 
   return (
-    <>
+    <div className="fixed w-full">
       <div id="navbar">
         <div id="buttons" className="flex items-center justify-center p-4 space-x-4 z-10">
           <button
@@ -68,7 +68,7 @@ function App() {
           <Scene/>
         </Canvas>
       </div>
-    </>
+    </div>
   )
 }
 

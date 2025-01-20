@@ -84,7 +84,14 @@ const Scene = () => {
 
       const { camera } = useThree()
 
+      // Set initial camera position
+      useEffect(() => {
+        camera.position.set(c1cam.cam.position.x, c1cam.cam.position.y, c1cam.cam.position.z)
+        camera.rotation.set(c1cam.cam.rotation.x, c1cam.cam.rotation.y, c1cam.cam.rotation.z)
+      }, [])
+
       gsap.registerPlugin(ScrollTrigger)
+
       const timeline = gsap.timeline({
         scrollTrigger: {
           trigger: 'body',

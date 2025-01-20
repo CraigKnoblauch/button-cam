@@ -113,3 +113,18 @@ if(scroll.visible(0, 1/3)) {
   if (!pyramid_button_active) { setPyramidButton() }
 }
 ```
+
+# Animations with GSAP
+GSAP has introduced a lot of abstraction, but it's also introduced quite a few bugs.
+
+- [ ] Scrolling properly appears to require enough of the page to support all of the sections. The sections may also have to be associated with each of the page sections. That needs to be solved
+- [x] If the page is becoming larger, the canvas, buttons, and dot stack are staying fixed a the top of the body instead of scrolling down with the page.
+- [ ] The scroll bar is visible on the side
+- [ ] The buttons and dot stack aren't updating with the change of sections with GSAP. Makes sense because I don't think the logic is in place for that. That needs to happen in a decoupled way so the button store and actions don't have to be changed and so that they don't have to know about what's going on with GSAP. 
+- [ ] In general the timings and animations are wonky right now.
+
+Lots of bugs and logic undone, but I think organizing my website with pages and more in the way the DOM expects is a better way in general. Most libraries will expect my site to have actual pages so it would be good to build with that in mind (I think).
+
+## Keeping the elements in view even with the body larger to accomodate scrolling
+In the index.css I gave the body a height of 900vh to support each section being 100vh.
+Wrapping everything in App.jsx in another div with `className="fixed w-full"` solved this problem.
