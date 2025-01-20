@@ -5,6 +5,8 @@ import { useThree } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ScrollToPlugin } from "gsap/ScrollToPlugin";
+// https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollToPlugin.min.js
 
 const Scene = () => {
     const { scene } = useGLTF("./models/scene.glb");
@@ -91,6 +93,7 @@ const Scene = () => {
       }, [])
 
       gsap.registerPlugin(ScrollTrigger)
+      gsap.registerPlugin(ScrollToPlugin)
 
       const timeline = gsap.timeline({
         scrollTrigger: {
@@ -98,38 +101,44 @@ const Scene = () => {
           start: 'top top',
           end: 'bottom bottom',
           scrub: 1,
-          snap: {
-            snapTo: 'labels', // snap to the closest label in the timeline
-            duration: { min: 0.1, max: 3 }, // the snap animation should be at least 0.2 seconds, but no more than 3 seconds (determined by velocity)
-            delay: 0, // wait 0.2 seconds from the last scroll event before doing the snapping
-            ease: 'power1.inOut' // the ease of the snap animation ("power3" by default)
-          }
+          // snap: {
+          //   snapTo: 'labels', // snap to the closest label in the timeline
+          //   duration: { min: 0.1, max: 3 }, // the snap animation should be at least 0.2 seconds, but no more than 3 seconds (determined by velocity)
+          //   delay: 0.2, // wait 0.2 seconds from the last scroll event before doing the snapping
+          //   ease: 'power1.inOut' // the ease of the snap animation ("power3" by default)
+          // }
         }
       })
 
       // add animations and labels to the timeline
+      /**
+       * NOTE: Do not set the buttons here. Too many side effects.
+       */
       timeline.addLabel('cubes')
-              .add( () => { setCubeButton() })
-              .to(camera.position, { x: c1cam.cam.position.x, y: c1cam.cam.position.y, z: c1cam.cam.position.z, duration: 0.1 })
-              .to(camera.rotation, { x: c1cam.cam.rotation.x, y: c1cam.cam.rotation.y, z: c1cam.cam.rotation.z, duration: 0.1 })
+              .to(camera.position, { x: c1cam.cam.position.x, y: c1cam.cam.position.y, z: c1cam.cam.position.z, duration: 1 })
+              .to(camera.rotation, { x: c1cam.cam.rotation.x, y: c1cam.cam.rotation.y, z: c1cam.cam.rotation.z, duration: 1 })
               .addLabel('spheres')
-              .add( () => { setSphereButton() })
-              .to(camera.position, { x: s1cam.cam.position.x, y: s1cam.cam.position.y, z: s1cam.cam.position.z, duration: 0.1 })
-              .to(camera.rotation, { x: s1cam.cam.rotation.x, y: s1cam.cam.rotation.y, z: s1cam.cam.rotation.z, duration: 0.1 })
+              .to(camera.position, { x: s1cam.cam.position.x, y: s1cam.cam.position.y, z: s1cam.cam.position.z, duration: 1 })
+              .to(camera.rotation, { x: s1cam.cam.rotation.x, y: s1cam.cam.rotation.y, z: s1cam.cam.rotation.z, duration: 1 })
               .addLabel('pyramids')
-              .add( () => { setPyramidButton() })
-              .to(camera.position, { x: p1cam.cam.position.x, y: p1cam.cam.position.y, z: p1cam.cam.position.z, duration: 0.1 })
-              .to(camera.rotation, { x: p1cam.cam.rotation.x, y: p1cam.cam.rotation.y, z: p1cam.cam.rotation.z, duration: 0.1 })
-              .addLabel('end');
+              .to(camera.position, { x: p1cam.cam.position.x, y: p1cam.cam.position.y, z: p1cam.cam.position.z, duration: 1 })
+              .to(camera.rotation, { x: p1cam.cam.rotation.x, y: p1cam.cam.rotation.y, z: p1cam.cam.rotation.z, duration: 1 })
 
-      // useEffect(() => {
-      //   console.log("Start cam position: ", camera.position)
-      //   if (cube_button_active) { timeline.tweenTo('cubes') } 
-      //   else if (sphere_button_active) { timeline.tweenTo('spheres') } 
-      //   else if (pyramid_button_active) { timeline.tweenTo('pyramids') }
-      //   console.log("Camera position: ", camera.position)
-      //   console.log("Camera rotation: ", camera.rotation)
-      // }, [cube_button_active, sphere_button_active, pyramid_button_active])
+      useEffect(() => {
+        console.log("Start cam position: ", camera.position)
+        if (cube_button_active) { 
+          gsap.to(window, { duration: 2, scrollTo: "#cubes" }) 
+          // timeline.seek('cubes')
+        } 
+        else if (sphere_button_active) { 
+          gsap.to(window, { duration: 2, scrollTo: "#spheres" }) 
+        }
+        else if (pyramid_button_active) { 
+          gsap.to(window, { duration: 2, scrollTo: "#pyramids" }) 
+        }
+        console.log("Camera position: ", camera.position)
+        console.log("Camera rotation: ", camera.rotation)
+      }, [cube_button_active, sphere_button_active, pyramid_button_active])
 
       return <>
         <primitive object={ground} material={new THREE.MeshStandardMaterial({ color: 0x877763 })} />

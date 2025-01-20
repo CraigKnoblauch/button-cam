@@ -129,3 +129,5 @@ Lots of bugs and logic undone, but I think organizing my website with pages and 
 ## Keeping the elements in view even with the body larger to accomodate scrolling
 In the index.css I gave the body a height of 900vh to support each section being 100vh.
 Wrapping everything in App.jsx in another div with `className="fixed w-full"` solved this problem.
+
+Learned that the z index in css relates to only elements that have the same parent.
