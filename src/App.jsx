@@ -1,6 +1,6 @@
 import { useButtonStore } from 'src/stores/ButtonStore'
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls, ScrollControls, Scroll } from '@react-three/drei'
+import { OrbitControls } from '@react-three/drei'
 import Scene from 'src/components/Scene'
 // import './App.css'
 
@@ -65,9 +65,7 @@ function App() {
         <Canvas>
           <OrbitControls enableZoom={false}/>
           <ambientLight/>
-          <ScrollControls pages={1}>
-            <Scene/>
-          </ScrollControls>
+          <Scene/>
         </Canvas>
       </div>
     </>

@@ -1,8 +1,10 @@
-import { useGLTF, useScroll } from "@react-three/drei";
+import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import { useButtonStore } from "src/stores/ButtonStore";
-import { useThree, useFrame } from "@react-three/fiber";
+import { useThree } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 const Scene = () => {
     const { scene } = useGLTF("./models/scene.glb");
@@ -81,59 +83,43 @@ const Scene = () => {
       } = useButtonStore()
 
       const { camera } = useThree()
-      const scroll = useScroll()
 
-      useFrame((state, delta) => {
-
-        // const { cube_button_active, sphere_button_active, pyramid_button_active } = useButtonStore()
-
-        if(scroll.visible(0, 1/3)) {
-          if (!cube_button_active) { setCubeButton() }
-        } else if(scroll.visible(1/3, 1/3)) {
-          if (!sphere_button_active) { setSphereButton() }
-        } else if(scroll.visible(2/3, 1/3)) {
-          if (!pyramid_button_active) { setPyramidButton() }
+      gsap.registerPlugin(ScrollTrigger)
+      const timeline = gsap.timeline({
+        scrollTrigger: {
+          trigger: 'body',
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: 1,
+          snap: {
+            snapTo: 'labels', // snap to the closest label in the timeline
+            duration: { min: 0.1, max: 3 }, // the snap animation should be at least 0.2 seconds, but no more than 3 seconds (determined by velocity)
+            delay: 0, // wait 0.2 seconds from the last scroll event before doing the snapping
+            ease: 'power1.inOut' // the ease of the snap animation ("power3" by default)
+          }
         }
       })
 
+      // add animations and labels to the timeline
+      timeline.addLabel('cubes')
+              .to(camera.position, { x: c1cam.cam.position.x, y: c1cam.cam.position.y, z: c1cam.cam.position.z, duration: 0.1 })
+              .to(camera.rotation, { x: c1cam.cam.rotation.x, y: c1cam.cam.rotation.y, z: c1cam.cam.rotation.z, duration: 0.1 })
+              .addLabel('spheres')
+              .to(camera.position, { x: s1cam.cam.position.x, y: s1cam.cam.position.y, z: s1cam.cam.position.z, duration: 0.1 })
+              .to(camera.rotation, { x: s1cam.cam.rotation.x, y: s1cam.cam.rotation.y, z: s1cam.cam.rotation.z, duration: 0.1 })
+              .addLabel('pyramids')
+              .to(camera.position, { x: p1cam.cam.position.x, y: p1cam.cam.position.y, z: p1cam.cam.position.z, duration: 0.1 })
+              .to(camera.rotation, { x: p1cam.cam.rotation.x, y: p1cam.cam.rotation.y, z: p1cam.cam.rotation.z, duration: 0.1 })
+              .addLabel('end');
+
       useEffect(() => {
         console.log("Start cam position: ", camera.position)
-        if (cube_button_active) {
-
-          // NOTE: The scrollTo setting doesn't take until after the frame where it is set passes.
-          // This is why is set both the offset and the scrollTo. The manual offset setting will be evaluated
-          // in this frame, and then the underlying drei logic will correct the offset to something
-          // close to what I set here.
-          scroll.offset = 0 + 0.01
-          scroll.el.scrollTo(0, 0);
-          const primaryCubeCam = sceneCams.find(cam => cam.group === "cubes" && cam.isPrimary);
-          sceneCamsIndexRef.current = sceneCams.findIndex(cam => cam.group === "cubes" && cam.isPrimary);
-          camera.position.set(primaryCubeCam.cam.position.x, primaryCubeCam.cam.position.y, primaryCubeCam.cam.position.z)
-          camera.rotation.set(primaryCubeCam.cam.rotation.x, primaryCubeCam.cam.rotation.y, primaryCubeCam.cam.rotation.z)
-
-        } else if (sphere_button_active) {
-
-          scroll.offset = 1/3 + 0.01
-          scroll.el.scrollTo(0, (document.body.scrollHeight / 3)+1);
-          const primarySphereCam = sceneCams.find(cam => cam.group === "spheres" && cam.isPrimary);
-          sceneCamsIndexRef.current = sceneCams.findIndex(cam => cam.group === "spheres" && cam.isPrimary);
-          camera.position.set(primarySphereCam.cam.position.x, primarySphereCam.cam.position.y, primarySphereCam.cam.position.z)
-          camera.rotation.set(primarySphereCam.cam.rotation.x, primarySphereCam.cam.rotation.y, primarySphereCam.cam.rotation.z)
-
-        } else if (pyramid_button_active) {
-
-          scroll.offset = 2/3 + 0.01
-          scroll.el.scrollTo(0, (document.body.scrollHeight / 3)*2+1);
-          const primaryPyramidCam = sceneCams.find(cam => cam.group === "pyramids" && cam.isPrimary);
-          sceneCamsIndexRef.current = sceneCams.findIndex(cam => cam.group === "pyramids" && cam.isPrimary);
-          camera.position.set(primaryPyramidCam.cam.position.x, primaryPyramidCam.cam.position.y, primaryPyramidCam.cam.position.z)
-          camera.rotation.set(primaryPyramidCam.cam.rotation.x, primaryPyramidCam.cam.rotation.y, primaryPyramidCam.cam.rotation.z)
-
-        }
+        if (cube_button_active) { timeline.tweenTo('cubes') } 
+        else if (sphere_button_active) { timeline.tweenTo('spheres') } 
+        else if (pyramid_button_active) { timeline.tweenTo('pyramids') }
         console.log("Camera position: ", camera.position)
         console.log("Camera rotation: ", camera.rotation)
-        console.log("Scroll: ", scroll)
-      }, [cube_button_active, sphere_button_active, pyramid_button_active, scroll])
+      }, [cube_button_active, sphere_button_active, pyramid_button_active])
 
       return <>
         <primitive object={ground} material={new THREE.MeshStandardMaterial({ color: 0x877763 })} />
