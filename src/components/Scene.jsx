@@ -109,24 +109,27 @@ const Scene = () => {
 
       // add animations and labels to the timeline
       timeline.addLabel('cubes')
+              .add( () => { setCubeButton() })
               .to(camera.position, { x: c1cam.cam.position.x, y: c1cam.cam.position.y, z: c1cam.cam.position.z, duration: 0.1 })
               .to(camera.rotation, { x: c1cam.cam.rotation.x, y: c1cam.cam.rotation.y, z: c1cam.cam.rotation.z, duration: 0.1 })
               .addLabel('spheres')
+              .add( () => { setSphereButton() })
               .to(camera.position, { x: s1cam.cam.position.x, y: s1cam.cam.position.y, z: s1cam.cam.position.z, duration: 0.1 })
               .to(camera.rotation, { x: s1cam.cam.rotation.x, y: s1cam.cam.rotation.y, z: s1cam.cam.rotation.z, duration: 0.1 })
               .addLabel('pyramids')
+              .add( () => { setPyramidButton() })
               .to(camera.position, { x: p1cam.cam.position.x, y: p1cam.cam.position.y, z: p1cam.cam.position.z, duration: 0.1 })
               .to(camera.rotation, { x: p1cam.cam.rotation.x, y: p1cam.cam.rotation.y, z: p1cam.cam.rotation.z, duration: 0.1 })
               .addLabel('end');
 
-      useEffect(() => {
-        console.log("Start cam position: ", camera.position)
-        if (cube_button_active) { timeline.tweenTo('cubes') } 
-        else if (sphere_button_active) { timeline.tweenTo('spheres') } 
-        else if (pyramid_button_active) { timeline.tweenTo('pyramids') }
-        console.log("Camera position: ", camera.position)
-        console.log("Camera rotation: ", camera.rotation)
-      }, [cube_button_active, sphere_button_active, pyramid_button_active])
+      // useEffect(() => {
+      //   console.log("Start cam position: ", camera.position)
+      //   if (cube_button_active) { timeline.tweenTo('cubes') } 
+      //   else if (sphere_button_active) { timeline.tweenTo('spheres') } 
+      //   else if (pyramid_button_active) { timeline.tweenTo('pyramids') }
+      //   console.log("Camera position: ", camera.position)
+      //   console.log("Camera rotation: ", camera.rotation)
+      // }, [cube_button_active, sphere_button_active, pyramid_button_active])
 
       return <>
         <primitive object={ground} material={new THREE.MeshStandardMaterial({ color: 0x877763 })} />
