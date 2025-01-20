@@ -67,3 +67,49 @@ There are primary camera postions for each group of models. The camera position,
 
 # Transforms in Blender
 Make sure to only apply transformations on rotation and scale. Otherwise the origin of all objects gets set to the center. And thus the position of all objects will seem to be the center.
+
+# Animations on scroll
+TODO, look into using GSAP and have a timeline of camera positions on scroll triggers
+
+Tried this first but the logic was very finnicky:
+```js
+/** 
+ * There being 3 sections, each section would be 1/3 of the page away from each other.
+* There are 3 models per section, and each model is 1/3 of the section away from each other.
+* 
+* If I find myself in a section, I then have to know what sub section I'm in. 
+* i.e. I find I'm in section one, visible(0, 1/3)
+* Then I need to know if I'm in sub-section 1: visible(0, (1/3)/3) aka 1/3 of the whole page divided by the 3 models in the section
+*                               sub-section 2: visible((1/3)/3, (1/3)/3) aka The end of subsection 1, up to the start of subsection 2
+*                               sub-section 3: visible(((1/3)/3)*2, (1/3)/3) aka The end of subsection 2, up to the end of the section
+*/
+if(scroll.visible(0, 1/3)) {
+  // Scroll position is in section 1
+  if (!cube_button_active) { 
+    // The user just got to section 1, and setting this button active will trigger a camera change to
+    // the primary camera
+    setCubeButton() 
+  } else {
+    // The user is in section 1, and is scrolling to subsections.
+    // Now we inquire, what subsection they are in.
+    if(scroll.visible((1/3)/3, (1/3)/3)) {
+      // The user is in subsection 2
+      const cam = sceneCams.find(cam => cam.group === "cubes" && cam.position === 2);
+      sceneCamsIndexRef.current = sceneCams.findIndex(cam => cam.group === "cubes" && cam.position === 2);
+      camera.position.set(cam.cam.position.x, cam.cam.position.y, cam.cam.position.z)
+      camera.rotation.set(cam.cam.rotation.x, cam.cam.rotation.y, cam.cam.rotation.z)
+
+    } else if(scroll.visible(((1/3)/3)*2, (1/3)/3)) {
+      // The user is in subsection 3
+      const cam = sceneCams.find(cam => cam.group === "cubes" && cam.position === 3);
+      sceneCamsIndexRef.current = sceneCams.findIndex(cam => cam.group === "cubes" && cam.position === 3);
+      camera.position.set(cam.cam.position.x, cam.cam.position.y, cam.cam.position.z)
+      camera.rotation.set(cam.cam.rotation.x, cam.cam.rotation.y, cam.cam.rotation.z)
+    }
+  }
+} else if(scroll.visible(1/3, 1/3)) {
+  if (!sphere_button_active) { setSphereButton() }
+} else if(scroll.visible(2/3, 1/3)) {
+  if (!pyramid_button_active) { setPyramidButton() }
+}
+```
