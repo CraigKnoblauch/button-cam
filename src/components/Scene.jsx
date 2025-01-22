@@ -129,6 +129,9 @@ const Scene = () => {
       const previousActiveButton = useRef(null)
 
       useEffect(() => {
+        // The behavior I'm looking for: https://codepen.io/GreenSock/pen/bGexQpq
+
+
         console.log("Start cam position: ", camera.position)
         // if (cube_button_active && previousActiveButton.current !== "cubes") { 
         //     if (window.scrollY !== document.querySelector("#cubes").offsetTop) {
