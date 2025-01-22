@@ -10,8 +10,6 @@ import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 
 const Scene = () => {
     const { scene } = useGLTF("./models/scene.glb");
-    
-      console.log(scene)
 
       const findModelByName = (name) => {
         let foundModel = null;
@@ -95,47 +93,71 @@ const Scene = () => {
       gsap.registerPlugin(ScrollTrigger)
       gsap.registerPlugin(ScrollToPlugin)
 
+      /**
+       * NOTE: Avoiding the use of snap for now until I know more. I was seeing this behavior where when I was scrolling to a new section
+       * The scroll bar and the animation would pull back on its own. That behavior goes away if I don't have snap.
+       */
       const timeline = gsap.timeline({
         scrollTrigger: {
           trigger: 'body',
           start: 'top top',
           end: 'bottom bottom',
-          scrub: 1,
-          // snap: {
-          //   snapTo: 'labels', // snap to the closest label in the timeline
-          //   duration: { min: 0.1, max: 3 }, // the snap animation should be at least 0.2 seconds, but no more than 3 seconds (determined by velocity)
-          //   delay: 0.2, // wait 0.2 seconds from the last scroll event before doing the snapping
-          //   ease: 'power1.inOut' // the ease of the snap animation ("power3" by default)
-          // }
+          scrub: 1
         }
       })
 
       // add animations and labels to the timeline
       /**
-       * NOTE: Do not set the buttons here. Too many side effects.
+       * NOTE: If setting buttons here, they should go at the beginning of a label with no delay
+       * NOTE: fromTo needed further down the timeline to assure transitions from correct model positions. See this in the docs:
+       * https://gsap.com/resources/st-mistakes/#creating-to-logic-issues
        */
       timeline.addLabel('cubes')
-              .to(camera.position, { x: c1cam.cam.position.x, y: c1cam.cam.position.y, z: c1cam.cam.position.z, duration: 1 })
-              .to(camera.rotation, { x: c1cam.cam.rotation.x, y: c1cam.cam.rotation.y, z: c1cam.cam.rotation.z, duration: 1 })
+              // .add( () => { setCubeButton() } )
+              .to(camera.position, { x: c1cam.cam.position.x, y: c1cam.cam.position.y, z: c1cam.cam.position.z })
+              .to(camera.rotation, { x: c1cam.cam.rotation.x, y: c1cam.cam.rotation.y, z: c1cam.cam.rotation.z })
               .addLabel('spheres')
-              .to(camera.position, { x: s1cam.cam.position.x, y: s1cam.cam.position.y, z: s1cam.cam.position.z, duration: 1 })
-              .to(camera.rotation, { x: s1cam.cam.rotation.x, y: s1cam.cam.rotation.y, z: s1cam.cam.rotation.z, duration: 1 })
+              // .add( () => { setSphereButton() } )
+              .fromTo(camera.position, { x: c1cam.cam.position.x, y: c1cam.cam.position.y, z: c1cam.cam.position.z }, { x: s1cam.cam.position.x, y: s1cam.cam.position.y, z: s1cam.cam.position.z })
+              .fromTo(camera.rotation, { x: c1cam.cam.rotation.x, y: c1cam.cam.rotation.y, z: c1cam.cam.rotation.z }, { x: s1cam.cam.rotation.x, y: s1cam.cam.rotation.y, z: s1cam.cam.rotation.z })
               .addLabel('pyramids')
-              .to(camera.position, { x: p1cam.cam.position.x, y: p1cam.cam.position.y, z: p1cam.cam.position.z, duration: 1 })
-              .to(camera.rotation, { x: p1cam.cam.rotation.x, y: p1cam.cam.rotation.y, z: p1cam.cam.rotation.z, duration: 1 })
+              // .add( () => { setPyramidButton() } )
+              .fromTo(camera.position, { x: s1cam.cam.position.x, y: s1cam.cam.position.y, z: s1cam.cam.position.z }, { x: p1cam.cam.position.x, y: p1cam.cam.position.y, z: p1cam.cam.position.z })
+              .fromTo(camera.rotation, { x: s1cam.cam.rotation.x, y: s1cam.cam.rotation.y, z: s1cam.cam.rotation.z }, { x: p1cam.cam.rotation.x, y: p1cam.cam.rotation.y, z: p1cam.cam.rotation.z })
+              
+
+      const previousActiveButton = useRef(null)
 
       useEffect(() => {
         console.log("Start cam position: ", camera.position)
-        if (cube_button_active) { 
-          gsap.to(window, { duration: 2, scrollTo: "#cubes" }) 
-          // timeline.seek('cubes')
-        } 
-        else if (sphere_button_active) { 
-          gsap.to(window, { duration: 2, scrollTo: "#spheres" }) 
-        }
-        else if (pyramid_button_active) { 
-          gsap.to(window, { duration: 2, scrollTo: "#pyramids" }) 
-        }
+        // if (cube_button_active && previousActiveButton.current !== "cubes") { 
+        //     if (window.scrollY !== document.querySelector("#cubes").offsetTop) {
+        //       gsap.to(window, { duration: 2, scrollTo: "#cubes" }) 
+        //     }
+
+
+        //   // gsap.to(window, { duration: 2, scrollTo: "#cubes" }) 
+        //   previousActiveButton.current = "cubes"
+        //   // timeline.seek('cubes')
+        // } 
+        // else if (sphere_button_active && previousActiveButton.current !== "spheres") { 
+        //   if (window.scrollY !== document.querySelector("#spheres").offsetTop) {
+        //     gsap.to(window, { duration: 2, scrollTo: "#spheres" }) 
+        //   }
+
+
+        //   // gsap.to(window, { duration: 2, scrollTo: "#spheres" }) 
+        //   previousActiveButton.current = "spheres"
+        // }
+        // else if (pyramid_button_active && previousActiveButton.current !== "pyramids") { 
+        //   if (window.scrollY !== document.querySelector("#pyramids").offsetTop) {
+        //     gsap.to(window, { duration: 2, scrollTo: "#pyramids" }) 
+        //   }
+
+
+        //   // gsap.to(window, { duration: 2, scrollTo: "#pyramids" }) 
+        //   previousActiveButton.current = "pyramids"
+        // }
         console.log("Camera position: ", camera.position)
         console.log("Camera rotation: ", camera.rotation)
       }, [cube_button_active, sphere_button_active, pyramid_button_active])
