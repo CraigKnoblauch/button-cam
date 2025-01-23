@@ -62,7 +62,7 @@ I've been having a lot of issues trying to share the state between the button gr
 There are primary camera postions for each group of models. The camera position, rotation, fov, etc can be copied from the destination camera object. The primary camera positions are where the camera goes when the user clicks the corresponding button. The secondary camera postions are sought by scroll. Scroll views all cameras as a list. It doesn't care about primary or secondary cameras. The camera also needs to follow the camera path when it switches cameras.
 
 - [x] Button clicks switch camera to primary camera postions
-- [ ] Scroll wheel switches camera to next/previous camera in list 
+- ~~[ ] Scroll wheel switches camera to next/previous camera in list~~ Deprecated in favor of navigating with buttons
 - [ ] Camera switches follow a path
 
 # Transforms in Blender
@@ -131,3 +131,6 @@ In the index.css I gave the body a height of 900vh to support each section being
 Wrapping everything in App.jsx in another div with `className="fixed w-full"` solved this problem.
 
 Learned that the z index in css relates to only elements that have the same parent.
+
+# Deciding on no scroll
+I haven't been able to get the scroll trigger to work. I'm going to compromise on scope of the downstream project (the portfolio) and have the user navigate with buttons. I'll show forward and back buttons on the side or bottom of the screen.
