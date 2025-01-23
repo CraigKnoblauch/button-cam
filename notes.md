@@ -64,6 +64,7 @@ There are primary camera postions for each group of models. The camera position,
 - [x] Button clicks switch camera to primary camera postions
 - ~~[ ] Scroll wheel switches camera to next/previous camera in list~~ Deprecated in favor of navigating with buttons
 - [ ] Camera switches follow a path
+- [ ] Left and right buttons at bottom of the screen for in sequence between the models.
 
 # Transforms in Blender
 Make sure to only apply transformations on rotation and scale. Otherwise the origin of all objects gets set to the center. And thus the position of all objects will seem to be the center.
