@@ -6,6 +6,7 @@ import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
+import { MotionPathPlugin } from "gsap/src/all";
 // https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollToPlugin.min.js
 
 const Scene = () => {
@@ -21,7 +22,25 @@ const Scene = () => {
         return foundModel;
       };
 
+      // console.log(scene)
       const ground = findModelByName("ground");
+
+      const track = findModelByName("cam_path");
+      const points = track.geometry.attributes.position.array
+
+      const trackHeight = 1.5
+      const trackDivisions = 50000
+
+      const vec3Points = []
+      for (let i = 0; i < points.length; i += 3) {
+          vec3Points.push(new THREE.Vector3(points[i], points[i + 1] + trackHeight, points[i + 2]))
+      }
+
+      // Create a CatmullRomCurve3 from the track's vector3 points. 
+      // This points on this curve will be used to move the camera along the track
+      const trackCurve = new THREE.CatmullRomCurve3(vec3Points, true, 'catmullrom')
+      const trackPoints = trackCurve.getPoints(trackDivisions)
+      const trackPointsRef = useRef(trackPoints)
       
       const c1 = findModelByName("cube");
       const c2 = findModelByName("cube001");
@@ -85,11 +104,12 @@ const Scene = () => {
       const { camera } = useThree()
 
       // Set initial camera position
-      useEffect(() => {
-        camera.position.set(c1cam.cam.position.x, c1cam.cam.position.y, c1cam.cam.position.z)
-        camera.rotation.set(c1cam.cam.rotation.x, c1cam.cam.rotation.y, c1cam.cam.rotation.z)
-      }, [])
+      // useEffect(() => {
+      //   camera.position.set(c1cam.cam.position.x, c1cam.cam.position.y, c1cam.cam.position.z)
+      //   camera.rotation.set(c1cam.cam.rotation.x, c1cam.cam.rotation.y, c1cam.cam.rotation.z)
+      // }, [])
 
+      gsap.registerPlugin(MotionPathPlugin)
       // gsap.registerPlugin(ScrollTrigger)
       // gsap.registerPlugin(ScrollToPlugin)
 
@@ -136,13 +156,13 @@ const Scene = () => {
       useEffect(() => {
         // The behavior I'm looking for: https://codepen.io/GreenSock/pen/bGexQpq
         if (cube_button_active) {
-          gsap.to(camera.position, { x: c1cam.cam.position.x, y: c1cam.cam.position.y, z: c1cam.cam.position.z, duration: 1} )
+          gsap.to(camera.position, { motionPath: trackPoints.slice(0, trackDivisions/3), duration: 1 }) //x: c1cam.cam.position.x, y: c1cam.cam.position.y, z: c1cam.cam.position.z, duration: 1} )
           gsap.to(camera.rotation, { x: c1cam.cam.rotation.x, y: c1cam.cam.rotation.y, z: c1cam.cam.rotation.z, duration: 1} )
         } else if (sphere_button_active) {
-          gsap.to(camera.position, { x: s1cam.cam.position.x, y: s1cam.cam.position.y, z: s1cam.cam.position.z, duration: 1 })
+          gsap.to(camera.position, { motionPath: trackPoints.slice(trackDivisions/3, trackDivisions/3*2), duration: 1 }) // { x: s1cam.cam.position.x, y: s1cam.cam.position.y, z: s1cam.cam.position.z, duration: 1 })
           gsap.to(camera.rotation, { x: s1cam.cam.rotation.x, y: s1cam.cam.rotation.y, z: s1cam.cam.rotation.z, duration: 1 })
         } else if (pyramid_button_active) {
-          gsap.to(camera.position, { x: p1cam.cam.position.x, y: p1cam.cam.position.y, z: p1cam.cam.position.z, duration: 1 })
+          gsap.to(camera.position, { motionPath: trackPoints.slice(trackDivisions/3*2, trackDivisions-1), duration: 1 }) // { x: p1cam.cam.position.x, y: p1cam.cam.position.y, z: p1cam.cam.position.z, duration: 1 })
           gsap.to(camera.rotation, { x: p1cam.cam.rotation.x, y: p1cam.cam.rotation.y, z: p1cam.cam.rotation.z, duration: 1 })
         }
 
