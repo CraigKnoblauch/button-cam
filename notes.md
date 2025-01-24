@@ -135,3 +135,11 @@ Learned that the z index in css relates to only elements that have the same pare
 
 # Deciding on no scroll
 I haven't been able to get the scroll trigger to work. I'm going to compromise on scope of the downstream project (the portfolio) and have the user navigate with buttons. I'll show forward and back buttons on the side or bottom of the screen.
+
+# Finding point on path closest to camera position.
+All cameras have a point on the path. The y of the path is adjusted because it doesn't make it over into the threejs scene. Need a search method where I can find the index on the path that is closest to the camera postion in the scene. That index, and the index of the current camera, will be fed to the motionPath to determine a relevant segment.
+
+The curve in ThreeJs already has a method for getting the coordinate at a percentage through the curve. If I can determine where that camera is in terms of percentage around the curve, I can just query the curve directly for the point. Of course, if I have the percentage already, that's easier to use to determine the index on the path to use.
+
+# Animation in blender
+Camera movement can be animated in blender. Those keyframes can be fed into GSAP. That's the approach I'm going now.
