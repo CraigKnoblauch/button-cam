@@ -155,15 +155,21 @@ const Scene = () => {
 
       useEffect(() => {
         // The behavior I'm looking for: https://codepen.io/GreenSock/pen/bGexQpq
-        if (cube_button_active) {
-          gsap.to(camera.position, { motionPath: trackPoints.slice(0, trackDivisions/3), duration: 1 }) //x: c1cam.cam.position.x, y: c1cam.cam.position.y, z: c1cam.cam.position.z, duration: 1} )
-          gsap.to(camera.rotation, { x: c1cam.cam.rotation.x, y: c1cam.cam.rotation.y, z: c1cam.cam.rotation.z, duration: 1} )
-        } else if (sphere_button_active) {
-          gsap.to(camera.position, { motionPath: trackPoints.slice(trackDivisions/3, trackDivisions/3*2), duration: 1 }) // { x: s1cam.cam.position.x, y: s1cam.cam.position.y, z: s1cam.cam.position.z, duration: 1 })
+        if (cube_button_active && previousActiveButton.current !== "cube") {
+          // gsap.to(camera.position, { motionPath: trackPoints.slice(0, trackDivisions/3), duration: 1 }) 
+          gsap.to(camera.position, { x: c1cam.cam.position.x, y: c1cam.cam.position.y, z: c1cam.cam.position.z, duration: 1 })
+          gsap.to(camera.rotation, { x: c1cam.cam.rotation.x, y: c1cam.cam.rotation.y, z: c1cam.cam.rotation.z, duration: 1 })
+          previousActiveButton.current = "cube"
+        } else if (sphere_button_active && previousActiveButton.current !== "sphere") {
+          // gsap.to(camera.position, { motionPath: trackPoints.slice(trackDivisions/3, trackDivisions/3*2), duration: 1 }) // 
+          gsap.to(camera.position, { x: s1cam.cam.position.x, y: s1cam.cam.position.y, z: s1cam.cam.position.z, duration: 1 })
           gsap.to(camera.rotation, { x: s1cam.cam.rotation.x, y: s1cam.cam.rotation.y, z: s1cam.cam.rotation.z, duration: 1 })
-        } else if (pyramid_button_active) {
-          gsap.to(camera.position, { motionPath: trackPoints.slice(trackDivisions/3*2, trackDivisions-1), duration: 1 }) // { x: p1cam.cam.position.x, y: p1cam.cam.position.y, z: p1cam.cam.position.z, duration: 1 })
+          previousActiveButton.current = "sphere"
+        } else if (pyramid_button_active && previousActiveButton.current !== "pyramid") {
+          // gsap.to(camera.position, { motionPath: trackPoints.slice(trackDivisions/3*2, trackDivisions-1), duration: 1 }) // 
+          gsap.to(camera.position, { x: p1cam.cam.position.x, y: p1cam.cam.position.y, z: p1cam.cam.position.z, duration: 1 })
           gsap.to(camera.rotation, { x: p1cam.cam.rotation.x, y: p1cam.cam.rotation.y, z: p1cam.cam.rotation.z, duration: 1 })
+          previousActiveButton.current = "pyramid"
         }
 
 
