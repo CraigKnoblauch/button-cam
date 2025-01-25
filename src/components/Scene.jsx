@@ -62,21 +62,9 @@ const Scene = () => {
   const mixer = new THREE.AnimationMixer(myCamera)
   const { camera, set } = useThree()
   useEffect(() => {
-    set({ camera: myCamera })
+    camera.position.copy(myCamera.position)
+    camera.quaternion.copy(myCamera.quaternion)
   }, [])
-  // mixer.clipAction(animations[0]).play()
-
-  function convertToMotionPath(values) {
-    let path = []
-    for (let i = 0; i < values.length; i += 3) {
-      path.push(new THREE.Vector3(values[i], values[i + 1], values[i + 2]))
-    }
-    return path
-  }
-
-  function getDeadZoneValue(values) {
-    return new THREE.Vector3(values[0], values[1], values[2])
-  }
 
   /**
    * Animations clips are as follows:
@@ -108,42 +96,32 @@ const Scene = () => {
    */
   const previousActiveButton = useRef(null)
   const stopTime = useRef(0)
+  const go = useRef(false)
   useEffect(() => {
     // The behavior I'm looking for: https://codepen.io/GreenSock/pen/bGexQpq
     if (cube_button_active && previousActiveButton.current !== "cube") {
-      // Primary cube is at time 0
-      // mixer.setTime(0)
-      // mixer.clipAction(c1ToS1).setLoop(THREE.LoopOnce, 1).play()
+
       previousActiveButton.current = "cube"
+
     } else if (sphere_button_active && previousActiveButton.current !== "sphere") {
-      // Primary sphere is at time 3
-      // mixer.setTime(3)
-      // mixer.clipAction(c1ToS1).setLoop(THREE.LoopOnce, 0).play()
+
       c1ToS1Action.setLoop(THREE.LoopOnce, 0).play()
       previousActiveButton.current = "sphere"
+
     } else if (pyramid_button_active && previousActiveButton.current !== "pyramid") {
-      // Primary pyramid is at time 6
-      // mixer.setTime(6)
+
       s1ToP1Action.setLoop(THREE.LoopOnce, 0).play()
       previousActiveButton.current = "pyramid"
+
     }
   }, [cube_button_active, sphere_button_active, pyramid_button_active])
 
   useFrame((state, delta) => {
-    // if (mixer.time <= stopTime.current) {
-    //   mixer.update(delta)
-    // } else {
-    //   // mixer.pause()
-    // }
-    if (camera === myCamera === state.camera) {
-      console.log("same")
-    } else {
-      console.log("different")
-      
-    }
+
     mixer.update(delta)
-    console.log(myCamera.position)
-    console.log(camera.position)
+
+    state.camera.position.copy(myCamera.position)
+    state.camera.quaternion.copy(myCamera.quaternion)
   })
 
   return <>

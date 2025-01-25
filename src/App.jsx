@@ -1,6 +1,6 @@
 import { useButtonStore } from 'src/stores/ButtonStore'
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls } from '@react-three/drei'
+// import { OrbitControls } from '@react-three/drei'
 import Scene from 'src/components/Scene'
 // import './App.css'
 
@@ -68,7 +68,7 @@ function App() {
         <div className="h-screen z-10">
           <Canvas>
             {/* NOTE Disabling OrbitControls means the animation mixer in Scene no longer animates the scene camera. No idea why but it's a very real side effect */}
-            <OrbitControls enableZoom={false}/>
+            {/* <OrbitControls enableZoom={false}/> */}
             <ambientLight/>
             <Scene/>
           </Canvas>
