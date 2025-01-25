@@ -1,7 +1,7 @@
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import { useButtonStore } from "src/stores/ButtonStore";
-import { useThree } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -10,191 +10,156 @@ import { MotionPathPlugin } from "gsap/src/all";
 // https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollToPlugin.min.js
 
 const Scene = () => {
-    const { scene, animations } = useGLTF("./models/scene-with-animations.glb");
 
-      const findModelByName = (name) => {
-        let foundModel = null;
-        scene.traverse((child) => {
-          if (child.name === name) {
-            foundModel = child;
-          }
-        });
-        return foundModel;
-      };
+  gsap.registerPlugin(MotionPathPlugin)
 
-      // console.log(scene)
-      const ground = findModelByName("ground");
+  const { 
+    cube_button_active, sphere_button_active, pyramid_button_active,
+    setCubeButton, setSphereButton, setPyramidButton
+  } = useButtonStore()
 
-      // const track = findModelByName("cam_path");
-      // const points = track.geometry.attributes.position.array
-
-      // const trackHeight = 1.5
-      // const trackDivisions = 50000
-
-      // const vec3Points = []
-      // for (let i = 0; i < points.length; i += 3) {
-      //     vec3Points.push(new THREE.Vector3(points[i], points[i + 1] + trackHeight, points[i + 2]))
-      // }
-
-      // Create a CatmullRomCurve3 from the track's vector3 points. 
-      // This points on this curve will be used to move the camera along the track
-      // const trackCurve = new THREE.CatmullRomCurve3(vec3Points, true, 'catmullrom')
-      // const trackPoints = trackCurve.getPoints(trackDivisions)
-      // const trackPointsRef = useRef(trackPoints)
-      
-      const c1 = findModelByName("cube");
-      const c2 = findModelByName("cube001");
-      const c3 = findModelByName("cube002");
-
-      const c1Ref = useRef()
-      const c2Ref = useRef()
-      const c3Ref = useRef()
-
-      const s1 = findModelByName("sphere");
-      const s2 = findModelByName("sphere001");
-      const s3 = findModelByName("sphere002");
-
-      const s1Ref = useRef()
-      const s2Ref = useRef()
-      const s3Ref = useRef()
-
-      const p1 = findModelByName("pyramid");
-      const p2 = findModelByName("pyramid001");
-      const p3 = findModelByName("pyramid002");
-
-      const p1Ref = useRef()
-      const p2Ref = useRef()
-      const p3Ref = useRef()
-
-      /**
-       * For each camera position I need to know,
-       * 1. The position of the camera
-       * 2. The rotation of the camera
-       * 3. The target of the camera
-       * 4. The next camera
-       * 5. The previous camera
-       */
-      class SceneCam {
-        constructor(cam, target, isPrimary, group) {
-          this.cam = cam;
-          this.target = target;
-          this.isPrimary = isPrimary;
-          this.group = group;
-        }
+  const { scene, animations } = useGLTF("./models/scene-with-multiple-animations.glb");
+    
+  const findModelByName = (name) => {
+    let foundModel = null;
+    scene.traverse((child) => {
+      if (child.name === name) {
+        foundModel = child;
       }
+    });
+    return foundModel;
+  };
 
-      // const c1cam = new SceneCam(findModelByName("primary_cube_cam"), c1Ref, true, "cubes");
-      // const c2cam = new SceneCam(findModelByName("cube_cam_2"), c2Ref, false, "cubes");
-      // const c3cam = new SceneCam(findModelByName("cube_cam_3"), c3Ref, false, "cubes");
-      // const s1cam = new SceneCam(findModelByName("primary_sphere_cam"), s1Ref, true, "spheres");
-      // const s2cam = new SceneCam(findModelByName("sphere_cam_2"), s2Ref, false, "spheres");
-      // const s3cam = new SceneCam(findModelByName("sphere_cam_3"), s3Ref, false, "spheres");
-      // const p1cam = new SceneCam(findModelByName("primary_pyramid_cam"), p1Ref, true, "pyramids");
-      // const p2cam = new SceneCam(findModelByName("pyramid_cam_2"), p2Ref, false, "pyramids");
-      // const p3cam = new SceneCam(findModelByName("pyramid_cam_3"), p3Ref, false, "pyramids");
+  const ground = findModelByName("ground");
 
-      // const sceneCams = [c1cam, c2cam, c3cam, s1cam, s2cam, s3cam, p1cam, p2cam, p3cam]
+  const c1 = findModelByName("cube");
+  const c2 = findModelByName("cube001");
+  const c3 = findModelByName("cube002");
 
-      const myCam = findModelByName("Camera")
+  const c1Ref = useRef()
+  const c2Ref = useRef()
+  const c3Ref = useRef()
 
-      const sceneCamsIndexRef = useRef(0)
+  const s1 = findModelByName("sphere");
+  const s2 = findModelByName("sphere001");
+  const s3 = findModelByName("sphere002");
 
-      const { 
-        cube_button_active, sphere_button_active, pyramid_button_active,
-        setCubeButton, setSphereButton, setPyramidButton
-      } = useButtonStore()
+  const s1Ref = useRef()
+  const s2Ref = useRef()
+  const s3Ref = useRef()
 
-      const { camera } = useThree()
+  const p1 = findModelByName("pyramid");
+  const p2 = findModelByName("pyramid001");
+  const p3 = findModelByName("pyramid002");
 
-      // Set initial camera position
-      // useEffect(() => {
-      //   camera.position.set(c1cam.cam.position.x, c1cam.cam.position.y, c1cam.cam.position.z)
-      //   camera.rotation.set(c1cam.cam.rotation.x, c1cam.cam.rotation.y, c1cam.cam.rotation.z)
-      // }, [])
+  const p1Ref = useRef()
+  const p2Ref = useRef()
+  const p3Ref = useRef()
 
-      gsap.registerPlugin(MotionPathPlugin)
-      // gsap.registerPlugin(ScrollTrigger)
-      // gsap.registerPlugin(ScrollToPlugin)
+  const myCamera = findModelByName("Camera")
 
-      /**
-       * NOTE: Avoiding the use of snap for now until I know more. I was seeing this behavior where when I was scrolling to a new section
-       * The scroll bar and the animation would pull back on its own. That behavior goes away if I don't have snap.
-       */
-      // const timeline = gsap.timeline({
-      //   scrollTrigger: {
-      //     trigger: 'body',
-      //     start: 'top top',
-      //     end: 'bottom bottom',
-      //     scrub: true,
-      //     // pin: true,
-      //     snap: {
-      //       snapTo: 'labels',
-      //       duration: { min: 0.1, max: 0.1 }
-      //     }
-      //   }
-      // })
+  // Set the camera when this component mounts
+  const mixer = new THREE.AnimationMixer(myCamera)
+  const { camera, set } = useThree()
+  useEffect(() => {
+    set({ camera: myCamera })
+  }, [])
+  // mixer.clipAction(animations[0]).play()
 
-      // // add animations and labels to the timeline
-      // /**
-      //  * NOTE: If setting buttons here, they should go at the beginning of a label with no delay
-      //  * NOTE: fromTo needed further down the timeline to assure transitions from correct model positions. See this in the docs:
-      //  * https://gsap.com/resources/st-mistakes/#creating-to-logic-issues
-      //  */
-      // timeline.addLabel('cubes')
-      //         .call(setCubeButton)
-      //         .to(camera.position, { x: c1cam.cam.position.x, y: c1cam.cam.position.y, z: c1cam.cam.position.z })
-      //         .to(camera.rotation, { x: c1cam.cam.rotation.x, y: c1cam.cam.rotation.y, z: c1cam.cam.rotation.z })
-      //         .addLabel('spheres')
-      //         .call(setSphereButton)
-      //         .fromTo(camera.position, { x: c1cam.cam.position.x, y: c1cam.cam.position.y, z: c1cam.cam.position.z }, { x: s1cam.cam.position.x, y: s1cam.cam.position.y, z: s1cam.cam.position.z })
-      //         .fromTo(camera.rotation, { x: c1cam.cam.rotation.x, y: c1cam.cam.rotation.y, z: c1cam.cam.rotation.z }, { x: s1cam.cam.rotation.x, y: s1cam.cam.rotation.y, z: s1cam.cam.rotation.z })
-      //         .addLabel('pyramids')
-      //         .call(setPyramidButton)
-      //         .fromTo(camera.position, { x: s1cam.cam.position.x, y: s1cam.cam.position.y, z: s1cam.cam.position.z }, { x: p1cam.cam.position.x, y: p1cam.cam.position.y, z: p1cam.cam.position.z })
-      //         .fromTo(camera.rotation, { x: s1cam.cam.rotation.x, y: s1cam.cam.rotation.y, z: s1cam.cam.rotation.z }, { x: p1cam.cam.rotation.x, y: p1cam.cam.rotation.y, z: p1cam.cam.rotation.z })
-              
+  function convertToMotionPath(values) {
+    let path = []
+    for (let i = 0; i < values.length; i += 3) {
+      path.push(new THREE.Vector3(values[i], values[i + 1], values[i + 2]))
+    }
+    return path
+  }
 
-      const previousActiveButton = useRef(null)
+  function getDeadZoneValue(values) {
+    return new THREE.Vector3(values[0], values[1], values[2])
+  }
 
-      useEffect(() => {
-        // The behavior I'm looking for: https://codepen.io/GreenSock/pen/bGexQpq
-        if (cube_button_active && previousActiveButton.current !== "cube") {
-          // gsap.to(camera.position, { motionPath: trackPoints.slice(0, trackDivisions/3), duration: 1 })
-          // Uncomment below if you go back to using exact camera positions. 
-          // gsap.to(camera.position, { x: c1cam.cam.position.x, y: c1cam.cam.position.y, z: c1cam.cam.position.z, duration: 1 })
-          // gsap.to(camera.rotation, { x: c1cam.cam.rotation.x, y: c1cam.cam.rotation.y, z: c1cam.cam.rotation.z, duration: 1 })
-          previousActiveButton.current = "cube"
-        } else if (sphere_button_active && previousActiveButton.current !== "sphere") {
-          // gsap.to(camera.position, { motionPath: trackPoints.slice(trackDivisions/3, trackDivisions/3*2), duration: 1 }) //
-          // Uncomment below if you go back to using exact camera positions. 
-          // gsap.to(camera.position, { x: s1cam.cam.position.x, y: s1cam.cam.position.y, z: s1cam.cam.position.z, duration: 1 })
-          // gsap.to(camera.rotation, { x: s1cam.cam.rotation.x, y: s1cam.cam.rotation.y, z: s1cam.cam.rotation.z, duration: 1 })
-          previousActiveButton.current = "sphere"
-        } else if (pyramid_button_active && previousActiveButton.current !== "pyramid") {
-          // gsap.to(camera.position, { motionPath: trackPoints.slice(trackDivisions/3*2, trackDivisions-1), duration: 1 }) // 
-          // Uncomment below if you go back to using exact camera positions.
-          // gsap.to(camera.position, { x: p1cam.cam.position.x, y: p1cam.cam.position.y, z: p1cam.cam.position.z, duration: 1 })
-          // gsap.to(camera.rotation, { x: p1cam.cam.rotation.x, y: p1cam.cam.rotation.y, z: p1cam.cam.rotation.z, duration: 1 })
-          previousActiveButton.current = "pyramid"
-        }
+  /**
+   * Animations clips are as follows:
+   * Frame 0 - 9: Primary cube deadzone
+   * Frame 9 - 69: Primary cube to primary sphere
+   * Frame 69 - 79: Primary sphere deadzone
+   * Frame 79 - 139: Primary sphere to primary pyramid
+   * Frame 139 - 149: Primary pyramid deadzone
+   * 
+   * Each of these are AnimationClip types. 
+   */
+  const c1Dz = new THREE.AnimationUtils.subclip(animations[0], "Cube Deadzone", 0, 9, 60)
+  const c1ToS1 = new THREE.AnimationUtils.subclip(animations[0], "Cube to Sphere", 9, 69, 60)
+  const s1Dz = new THREE.AnimationUtils.subclip(animations[0], "Sphere Deadzone", 69, 79, 60)
+  const s1ToP1 = new THREE.AnimationUtils.subclip(animations[0], "Sphere to Pyramid", 79, 139, 60)
+  const p1Dz = new THREE.AnimationUtils.subclip(animations[0], "Pyramid Deadzone", 139, 149, 60)
 
+  // Create AnimationActions for each transition information
+  const c1ToS1Action = mixer.clipAction(c1ToS1)
+  c1ToS1Action.clampWhenFinished = true
+  const s1ToP1Action = mixer.clipAction(s1ToP1)
+  s1ToP1Action.clampWhenFinished = true
+     
+  /**
+   * Will have a list of time values for each model to be viewed.
+   * When a primary button is presed, the animation will reverse or advance to the appropriate time value, whichever is more appropriate. (Still haven't figured out how to get the animation to be a cycle)
+   * When the next button is pressed, the animation will advance 1 second.
+   * When the back button is pressed, tha animation will retreat 1 second.
+   */
+  const previousActiveButton = useRef(null)
+  const stopTime = useRef(0)
+  useEffect(() => {
+    // The behavior I'm looking for: https://codepen.io/GreenSock/pen/bGexQpq
+    if (cube_button_active && previousActiveButton.current !== "cube") {
+      // Primary cube is at time 0
+      // mixer.setTime(0)
+      // mixer.clipAction(c1ToS1).setLoop(THREE.LoopOnce, 1).play()
+      previousActiveButton.current = "cube"
+    } else if (sphere_button_active && previousActiveButton.current !== "sphere") {
+      // Primary sphere is at time 3
+      // mixer.setTime(3)
+      // mixer.clipAction(c1ToS1).setLoop(THREE.LoopOnce, 0).play()
+      c1ToS1Action.setLoop(THREE.LoopOnce, 0).play()
+      previousActiveButton.current = "sphere"
+    } else if (pyramid_button_active && previousActiveButton.current !== "pyramid") {
+      // Primary pyramid is at time 6
+      // mixer.setTime(6)
+      s1ToP1Action.setLoop(THREE.LoopOnce, 0).play()
+      previousActiveButton.current = "pyramid"
+    }
+  }, [cube_button_active, sphere_button_active, pyramid_button_active])
 
-      }, [cube_button_active, sphere_button_active, pyramid_button_active])
+  useFrame((state, delta) => {
+    // if (mixer.time <= stopTime.current) {
+    //   mixer.update(delta)
+    // } else {
+    //   // mixer.pause()
+    // }
+    if (camera === myCamera === state.camera) {
+      console.log("same")
+    } else {
+      console.log("different")
+      
+    }
+    mixer.update(delta)
+    console.log(myCamera.position)
+    console.log(camera.position)
+  })
 
-      return <>
-        <primitive object={ground} material={new THREE.MeshStandardMaterial({ color: 0x877763 })} />
-        <primitive object={c1} ref={c1Ref} material={new THREE.MeshStandardMaterial({ color: 0xff0000 })}/>
-        <primitive object={c2} ref={c2Ref} material={new THREE.MeshStandardMaterial({ color: 0xff0000 })}/>
-        <primitive object={c3} ref={c3Ref} material={new THREE.MeshStandardMaterial({ color: 0xff0000 })}/>
+  return <>
+    <primitive object={ground} material={new THREE.MeshStandardMaterial({ color: 0x877763 })} />
+    <primitive object={c1} ref={c1Ref} material={new THREE.MeshStandardMaterial({ color: 0xff0000 })}/>
+    <primitive object={c2} ref={c2Ref} material={new THREE.MeshStandardMaterial({ color: 0xff0000 })}/>
+    <primitive object={c3} ref={c3Ref} material={new THREE.MeshStandardMaterial({ color: 0xff0000 })}/>
 
-        <primitive object={s1} ref={s1Ref} material={new THREE.MeshStandardMaterial({ color: 0x00ff00 })}/>
-        <primitive object={s2} ref={s2Ref} material={new THREE.MeshStandardMaterial({ color: 0x00ff00 })}/>
-        <primitive object={s3} ref={s3Ref} material={new THREE.MeshStandardMaterial({ color: 0x00ff00 })}/>
+    <primitive object={s1} ref={s1Ref} material={new THREE.MeshStandardMaterial({ color: 0x00ff00 })}/>
+    <primitive object={s2} ref={s2Ref} material={new THREE.MeshStandardMaterial({ color: 0x00ff00 })}/>
+    <primitive object={s3} ref={s3Ref} material={new THREE.MeshStandardMaterial({ color: 0x00ff00 })}/>
 
-        <primitive object={p1} ref={p1Ref} material={new THREE.MeshStandardMaterial({ color: 0x0000ff })}/>
-        <primitive object={p2} ref={p2Ref} material={new THREE.MeshStandardMaterial({ color: 0x0000ff })}/>
-        <primitive object={p3} ref={p3Ref} material={new THREE.MeshStandardMaterial({ color: 0x0000ff })}/>
-      </>
+    <primitive object={p1} ref={p1Ref} material={new THREE.MeshStandardMaterial({ color: 0x0000ff })}/>
+    <primitive object={p2} ref={p2Ref} material={new THREE.MeshStandardMaterial({ color: 0x0000ff })}/>
+    <primitive object={p3} ref={p3Ref} material={new THREE.MeshStandardMaterial({ color: 0x0000ff })}/>
+  </>
 }
 
 export default Scene

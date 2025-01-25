@@ -41,6 +41,8 @@ function App() {
             >
               Pyramids
             </button>
+            <button id="next" className="hover:bg-blue-500 p-2 rounded-lg">Next</button>
+            <button id="back" className="hover:bg-blue-500 p-2 rounded-lg">Back</button>
           </div>
 
           <div id="dot_stack" className="absolute z-20 top-0 right-0 h-screen flex flex-col justify-center items-center p-4">
@@ -65,6 +67,7 @@ function App() {
         </div>
         <div className="h-screen z-10">
           <Canvas>
+            {/* NOTE Disabling OrbitControls means the animation mixer in Scene no longer animates the scene camera. No idea why but it's a very real side effect */}
             <OrbitControls enableZoom={false}/>
             <ambientLight/>
             <Scene/>

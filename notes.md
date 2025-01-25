@@ -65,6 +65,7 @@ There are primary camera postions for each group of models. The camera position,
 - ~~[ ] Scroll wheel switches camera to next/previous camera in list~~ Deprecated in favor of navigating with buttons
 - [ ] Camera switches follow a path
 - [ ] Left and right buttons at bottom of the screen for in sequence between the models.
+- [ ] If the camera is in the middle of an animation and a new location is requested that is not the destination, the camera will find the best animation path to that destination.
 
 # Transforms in Blender
 Make sure to only apply transformations on rotation and scale. Otherwise the origin of all objects gets set to the center. And thus the position of all objects will seem to be the center.
@@ -143,3 +144,62 @@ The curve in ThreeJs already has a method for getting the coordinate at a percen
 
 # Animation in blender
 Camera movement can be animated in blender. Those keyframes can be fed into GSAP. That's the approach I'm going now.
+
+# Animations with the ThreeJs AnimationMixer
+I can use the AnimationMixer to play animations defined in blender. I can preview each animation and make sure it's what I want for each user movement in the area. I can also play an animation based on a button click. The animations in the mixer will be based on time, so I'll have to record the frame numbers, or timings, or some way to know what the resting position of a camera is for a particular model. 
+
+I've found that I can't get the location of the blender keyframes in the exported gltf file, so I have to do based off of time. For example, Let's say the movement from cube to sphere takes one second, goes from frames 0 to 60. That means the resting postion for the cube is at frame 0, and the resting position for the sphere is at frame 60. I record that in a file, and in the animation mixer, I pause the animtion when we get to frame 60.
+
+In the case where the user wants to go to the cubes group from the pyramids group, I can either:
+  - Interpolate directly to that postion and seek the animation playhead back to that frame
+  - Scrub the playhead back to that frame, basically playing the animations in reverse until the rigth frame is achieved.
+
+I wanted to have the camera be on a loop so we'll have to figure that out as well. Easy enough to put everything in a list and loop back on it.
+
+## Struggles with this approach
+1. Even when I subclip to the frame numbers that correspond with blender, the camera goes along a different track when I play the clip. This might have to do with how time and frames are handled. Although the advancement goes to the same place whether I'm using the VM or the host machine (more performce on host you would think the animation would go farther).
+2. The camera jumps when beginning a clip. I imagine this is because the beginning of the clip locaiton and the camera's current location are not exactly the same. I think a solution to that would be to create these 10 frame long dead zones that I can use to get the exact attributes the camera shoudl be in before starting an animation
+3. The camera goes through the animation, then resets to the beginning. This is a feature of animations. The deadzones mentioned above would help with that because I should be able to just pause the deadzone animation that would come immediately after the primary animation.
+
+## Reading about the animation system on threejs
+There are usually different named animation clips. Right now I'm subclipping one animation block, but you would think I would be able to animate the seperate paths into different clips.
+
+The AnimationMixer controls playback. The AnimationMixer is controlled by an AnimationAction.
+
+An AnimationObjectGroup shares an animation state.
+
+Get an AnimationAction object by using AnimationMixer.clipAction for caching and better performance.
+
+`AnimationAction.clampWhenFinished` **should pause the animation on the last frame**
+
+AnimationAction.loop defines the looping behavior: https://threejs.org/docs/index.html#api/en/animation/AnimationAction.loop
+
+# Deadzone experiment
+**This expriment is just a proof of concept. If the animation style works going from cube to sphere, and sphere to pyramid, stop the exeperiment there and pick an approach**
+
+Create the following frame sequence in blender:
+
+Frame 0 - 9: Primary cube deadzone
+Frame 10 - 69: Primary cube to primary sphere
+Frame 70 - 79: Primary sphere deadzone
+Frame 80 - 139: Primary sphere to primary pyramid
+Frame 140 - 149: Primary pyramid deadzone
+
+Write logic for the following:
+- [ ] The camera starts looking at the cube with the attributes in the primary cube deadzone
+- [ ] When a button is pressed, the camera follows the animation path to that section, and plays the deadzone animation after. The deadzone animation is paused before it ends.
+
+## Frames in blender don't match frames in threejs
+https://discourse.threejs.org/t/how-to-get-the-current-frame-number-of-model-animation/15847
+
+I've been reading this is because the animation system works on time rather than frames. So basically the frame number to threejs is going to be different compared to what it is in blender. We have to calculate what the start and stop frames in threejs land would be instead of taking the ones from blender directly.
+
+
+
+## With GSAP
+I'm so tempted to just take the values for the clips and feed them to gsap so I don't have to mess with the three js animation mixer. In fact I'm going to try that first
+
+Convert the values of each subclip into an array of Vector3 objects. Use that as a motionpath
+
+GSAP will take a lot more testing to understand what's going on and what it needs. I don't have the patience for it right now.
+
