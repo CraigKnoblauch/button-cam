@@ -32,29 +32,29 @@ const Scene = () => {
 
   const ground = findModelByName("ground");
 
-  const c1 = findModelByName("cube");
-  const c2 = findModelByName("cube001");
-  const c3 = findModelByName("cube002");
+  const c1Mesh = findModelByName("cube");
+  const c2Mesh = findModelByName("cube001");
+  const c3Mesh = findModelByName("cube002");
 
-  const c1Ref = useRef()
-  const c2Ref = useRef()
-  const c3Ref = useRef()
+  const c1MeshRef = useRef()
+  const c2MeshRef = useRef()
+  const c3MeshRef = useRef()
 
-  const s1 = findModelByName("sphere");
-  const s2 = findModelByName("sphere001");
-  const s3 = findModelByName("sphere002");
+  const s1Mesh = findModelByName("sphere");
+  const s2Mesh = findModelByName("sphere001");
+  const s3Mesh = findModelByName("sphere002");
 
-  const s1Ref = useRef()
-  const s2Ref = useRef()
-  const s3Ref = useRef()
+  const s1MeshRef = useRef()
+  const s2MeshRef = useRef()
+  const s3MeshRef = useRef()
 
-  const p1 = findModelByName("pyramid");
-  const p2 = findModelByName("pyramid001");
-  const p3 = findModelByName("pyramid002");
+  const p1Mesh = findModelByName("pyramid");
+  const p2Mesh = findModelByName("pyramid001");
+  const p3Mesh = findModelByName("pyramid002");
 
-  const p1Ref = useRef()
-  const p2Ref = useRef()
-  const p3Ref = useRef()
+  const p1MeshRef = useRef()
+  const p2MeshRef = useRef()
+  const p3MeshRef = useRef()
 
   const myCamera = findModelByName("Camera")
 
@@ -76,11 +76,130 @@ const Scene = () => {
    * 
    * Each of these are AnimationClip types. 
    */
-  const c1Dz = new THREE.AnimationUtils.subclip(animations[0], "Cube Deadzone", 0, 9, 60)
-  const c1ToS1 = new THREE.AnimationUtils.subclip(animations[0], "Cube to Sphere", 9, 69, 60)
-  const s1Dz = new THREE.AnimationUtils.subclip(animations[0], "Sphere Deadzone", 69, 79, 60)
-  const s1ToP1 = new THREE.AnimationUtils.subclip(animations[0], "Sphere to Pyramid", 79, 139, 60)
-  const p1Dz = new THREE.AnimationUtils.subclip(animations[0], "Pyramid Deadzone", 139, 149, 60)
+  class SceneTarget {
+    constructor(name, isPrimary) {
+      this.name = name
+      this.isPrimary = isPrimary
+      this.next = null
+      this.prev = null
+      this.toNextClip = null
+      this.toPrevClip = null // Note prev clips need to be reversed
+    }
+  }
+
+  const c1 = new SceneTarget("Cube 1", true)
+  const c2 = new SceneTarget("Cube 2", false)
+  const c3 = new SceneTarget("Cube 3", false)
+
+  const s1 = new SceneTarget("Sphere 1", true)
+  const s2 = new SceneTarget("Sphere 2", false)
+  const s3 = new SceneTarget("Sphere 3", false)
+
+  const p1 = new SceneTarget("Pyramid 1", true)
+  const p2 = new SceneTarget("Pyramid 2", false)
+  const p3 = new SceneTarget("Pyramid 3", false)
+
+  c1.next = c2
+  c1.prev = p3
+
+  c2.next = c3
+  c2.prev = c1
+
+  c3.next = s1
+  c3.prev = c2
+
+  s1.next = s2
+  s1.prev = c3
+
+  s2.next = s3
+  s2.prev = s1
+
+  s3.next = p1
+  s3.prev = s2
+
+  p1.next = p2
+  p1.prev = s3
+
+  p2.next = p3
+  p2.prev = p1
+
+  p3.next = c1
+  p3.prev = p2
+
+  c1.toNextClip = new THREE.AnimationUtils.subclip(animations[0], "c1NextClip", 10, 70, 60)
+  c1.toPrevClip = new THREE.AnimationUtils.subclip(animations[0], "c1PrevClip", 570, 630, 60)
+
+  c2.toNextClip = new THREE.AnimationUtils.subclip(animations[0], "c2NextClip", 80, 140, 60)
+  c2.toPrevClip = c1.toNextClip
+
+  c3.toNextClip = new THREE.AnimationUtils.subclip(animations[0], "c3NextClip", 150, 210, 60)
+  c3.toPrevClip = c2.toNextClip
+
+  s1.toNextClip = new THREE.AnimationUtils.subclip(animations[0], "s1NextClip", 220, 280, 60)
+  s1.toPrevClip = c3.toNextClip
+
+  s2.toNextClip = new THREE.AnimationUtils.subclip(animations[0], "s2NextClip", 290, 350, 60)
+  s2.toPrevClip = s1.toNextClip
+
+  s3.toNextClip = new THREE.AnimationUtils.subclip(animations[0], "s3NextClip", 360, 420, 60)
+  s3.toPrevClip = s2.toNextClip
+
+  p1.toNextClip = new THREE.AnimationUtils.subclip(animations[0], "p1NextClip", 430, 490, 60)
+  p1.toPrevClip = s3.toNextClip
+
+  p2.toNextClip = new THREE.AnimationUtils.subclip(animations[0], "p2NextClip", 500, 560, 60)
+  p2.toPrevClip = p1.toNextClip
+
+  p3.toNextClip = c1.toPrevClip
+  p3.toPrevClip = p2.toNextClip
+
+  const currentSceneTarget = useRef(c1)
+
+  // TODO, create a function that will find the path to the next target given the requested target and the current target
+  function findAnimPath(target) {
+    // Return a  list of AnimationActions?
+    // target is desired. Use currentSceneTarget.current as the current target
+    let found = false
+    let followRight = false
+    let followLeft = false
+    let rightMost = currentSceneTarget.current
+    let leftMost = currentSceneTarget.current
+    while (!found) {
+
+
+      if (rightMost === target) {
+        followRight = true
+        found = true
+        break
+      }
+
+      if (leftMost === target && !found) {
+        followLeft = true
+        found = true
+        break
+      } 
+
+      rightMost = rightMost.next
+      leftMost = leftMost.prev
+    }
+
+    let actions = []
+    let current = currentSceneTarget.current
+    if (followRight) {
+      while (current !== target) {
+        actions.push(mixer.clipAction(current.toNextClip))
+        current = current.next
+      }
+    } else {
+      while (current !== target) {
+        let action = mixer.clipAction(current.toPrevClip)
+        action.timeScale = -1
+        action.setLoop(THREE.LoopOnce) 
+        actions.push(action)
+        current = current.prev
+      }
+    }
+  }
 
   // Create AnimationActions for each transition information
   const c1ToS1Action = mixer.clipAction(c1ToS1)
@@ -105,6 +224,7 @@ const Scene = () => {
 
     } else if (sphere_button_active && previousActiveButton.current !== "sphere") {
 
+      const action = mixer.clipAction()
       c1ToS1Action.setLoop(THREE.LoopOnce, 0).play()
       previousActiveButton.current = "sphere"
 
@@ -126,17 +246,17 @@ const Scene = () => {
 
   return <>
     <primitive object={ground} material={new THREE.MeshStandardMaterial({ color: 0x877763 })} />
-    <primitive object={c1} ref={c1Ref} material={new THREE.MeshStandardMaterial({ color: 0xff0000 })}/>
-    <primitive object={c2} ref={c2Ref} material={new THREE.MeshStandardMaterial({ color: 0xff0000 })}/>
-    <primitive object={c3} ref={c3Ref} material={new THREE.MeshStandardMaterial({ color: 0xff0000 })}/>
+    <primitive object={c1Mesh} ref={c1MeshRef} material={new THREE.MeshStandardMaterial({ color: 0xff0000 })}/>
+    <primitive object={c2Mesh} ref={c2MeshRef} material={new THREE.MeshStandardMaterial({ color: 0xff0000 })}/>
+    <primitive object={c3Mesh} ref={c3MeshRef} material={new THREE.MeshStandardMaterial({ color: 0xff0000 })}/>
 
-    <primitive object={s1} ref={s1Ref} material={new THREE.MeshStandardMaterial({ color: 0x00ff00 })}/>
-    <primitive object={s2} ref={s2Ref} material={new THREE.MeshStandardMaterial({ color: 0x00ff00 })}/>
-    <primitive object={s3} ref={s3Ref} material={new THREE.MeshStandardMaterial({ color: 0x00ff00 })}/>
+    <primitive object={s1Mesh} ref={s1MeshRef} material={new THREE.MeshStandardMaterial({ color: 0x00ff00 })}/>
+    <primitive object={s2Mesh} ref={s2MeshRef} material={new THREE.MeshStandardMaterial({ color: 0x00ff00 })}/>
+    <primitive object={s3Mesh} ref={s3MeshRef} material={new THREE.MeshStandardMaterial({ color: 0x00ff00 })}/>
 
-    <primitive object={p1} ref={p1Ref} material={new THREE.MeshStandardMaterial({ color: 0x0000ff })}/>
-    <primitive object={p2} ref={p2Ref} material={new THREE.MeshStandardMaterial({ color: 0x0000ff })}/>
-    <primitive object={p3} ref={p3Ref} material={new THREE.MeshStandardMaterial({ color: 0x0000ff })}/>
+    <primitive object={p1Mesh} ref={p1MeshRef} material={new THREE.MeshStandardMaterial({ color: 0x0000ff })}/>
+    <primitive object={p2Mesh} ref={p2MeshRef} material={new THREE.MeshStandardMaterial({ color: 0x0000ff })}/>
+    <primitive object={p3Mesh} ref={p3MeshRef} material={new THREE.MeshStandardMaterial({ color: 0x0000ff })}/>
   </>
 }
 

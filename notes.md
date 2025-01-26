@@ -66,6 +66,8 @@ There are primary camera postions for each group of models. The camera position,
 - [ ] Camera switches follow a path
 - [ ] Left and right buttons at bottom of the screen for in sequence between the models.
 - [ ] If the camera is in the middle of an animation and a new location is requested that is not the destination, the camera will find the best animation path to that destination.
+- [ ] Swipe right means "left" from the cameras perspective
+- [ ] Swipe left means "right" from the camera's perspective
 
 # Transforms in Blender
 Make sure to only apply transformations on rotation and scale. Otherwise the origin of all objects gets set to the center. And thus the position of all objects will seem to be the center.
@@ -119,12 +121,12 @@ if(scroll.visible(0, 1/3)) {
 # Animations with GSAP
 GSAP has introduced a lot of abstraction, but it's also introduced quite a few bugs.
 
-- [ ] Scrolling properly appears to require enough of the page to support all of the sections. The sections may also have to be associated with each of the page sections. That needs to be solved
+- [ ] ~~Scrolling properly appears to require enough of the page to support all of the sections. The sections may also have to be associated with each of the page sections. That needs to be solved~~
 - [x] If the page is becoming larger, the canvas, buttons, and dot stack are staying fixed a the top of the body instead of scrolling down with the page.
 - [ ] The scroll bar is visible on the side
 - [x] The buttons and dot stack aren't updating with the change of sections with GSAP. Makes sense because I don't think the logic is in place for that. That needs to happen in a decoupled way so the button store and actions don't have to be changed and so that they don't have to know about what's going on with GSAP. 
-- [ ] In general the timings and animations are wonky right now.
-- [ ] The buttons no longer control where the camera gets animated to.
+- [x] In general the timings and animations are wonky right now.
+- [x] The buttons no longer control where the camera gets animated to.
 
 Lots of bugs and logic undone, but I think organizing my website with pages and more in the way the DOM expects is a better way in general. Most libraries will expect my site to have actual pages so it would be good to build with that in mind (I think).
 
@@ -194,12 +196,20 @@ https://discourse.threejs.org/t/how-to-get-the-current-frame-number-of-model-ani
 
 I've been reading this is because the animation system works on time rather than frames. So basically the frame number to threejs is going to be different compared to what it is in blender. We have to calculate what the start and stop frames in threejs land would be instead of taking the ones from blender directly.
 
-
-
 ## With GSAP
 I'm so tempted to just take the values for the clips and feed them to gsap so I don't have to mess with the three js animation mixer. In fact I'm going to try that first
 
 Convert the values of each subclip into an array of Vector3 objects. Use that as a motionpath
 
 GSAP will take a lot more testing to understand what's going on and what it needs. I don't have the patience for it right now.
+
+## Finally figured out AnimationMixer
+I found that if I animate my own camera object, then copy those properties to the state camera every frame, I don't have any weird bugs, the view looks good, and the animation is as smooth as in blender. I'll be going with this approach from now on.
+
+# Remaining features
+- [ ] Sub sections controlled by "Right"/"Left" buttons, alternatively swipes on mobile
+- [ ] Sections controlled by button click
+- [ ] Sections can be visited out of order by playing the shortest path animation
+- [ ] If a user wants to go to a different section/subsection in the middle of an animation, the animation is interrupted by starting to find the shortest path animation to their destination
+- [ ] Pyramid smoothly animates to cubes rather than going all the way around.
 

@@ -41,8 +41,8 @@ function App() {
             >
               Pyramids
             </button>
-            <button id="next" className="hover:bg-blue-500 p-2 rounded-lg">Next</button>
-            <button id="back" className="hover:bg-blue-500 p-2 rounded-lg">Back</button>
+            <button id="Left" className="hover:bg-blue-500 p-2 rounded-lg">Next</button>
+            <button id="Right" className="hover:bg-blue-500 p-2 rounded-lg">Back</button>
           </div>
 
           <div id="dot_stack" className="absolute z-20 top-0 right-0 h-screen flex flex-col justify-center items-center p-4">
