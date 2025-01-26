@@ -213,3 +213,46 @@ I found that if I animate my own camera object, then copy those properties to th
 - [ ] If a user wants to go to a different section/subsection in the middle of an animation, the animation is interrupted by starting to find the shortest path animation to their destination
 - [ ] Pyramid smoothly animates to cubes rather than going all the way around.
 
+## Chaining multiple animations together
+```js
+const action1 = mixer.clipAction(c2.toNextClip)
+const action2 = mixer.clipAction(c3.toNextClip)
+const action3 = mixer.clipAction(s1.toNextClip)
+
+action1.setLoop(THREE.LoopOnce, 1)
+action2.setLoop(THREE.LoopOnce, 1)
+action3.setLoop(THREE.LoopOnce, 1)
+
+// Second arg is duration. I think it would be the calling action's duration, but all durations are 1 so I can't know
+// for sure
+action1.crossFadeTo(action2, 1, true)
+action2.crossFadeTo(action3, 1, true)
+
+action3.clampWhenFinished = true
+
+action1.play()
+action2.play()
+action3.play()
+```
+
+Although this approach doesn't take the exact same path. It basically just interpolates the end destination.
+
+### Mixer action event listener
+```js
+mixer.addEventListener("finished", (e) => { console.log("Finished", e) })
+```
+
+```json
+Finished 
+{
+  Object: { type: "finished", action: {…}, direction: 1, target: {…} },
+  action: Object: { blendMode: 2500, _cacheIndex: 2, _byClipCacheIndex: 0, … },
+  direction: 1,
+  target: null,
+  type: "finished"
+}
+```
+
+## Going in reverse
+`action.setEffectiveTimescale(-1)` seems to play animations in reverse
+
