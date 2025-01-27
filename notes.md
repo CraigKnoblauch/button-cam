@@ -213,6 +213,17 @@ I found that if I animate my own camera object, then copy those properties to th
 - [ ] If a user wants to go to a different section/subsection in the middle of an animation, the animation is interrupted by starting to find the shortest path animation to their destination
 - [ ] Pyramid smoothly animates to cubes rather than going all the way around.
 
+# The need for a module to manage a structure of AnimationActions
+Vision of a data structure to hold these animation actions and allow for seamless traversal is taking shape. 
+I know that any movement will require a sequence of AnimationActions. Even the simplest move from one point to the next is technically a sequence of 1.
+I know that if I have a sequence of animation actions I need to play, I can apply the same modifications to each one. Such as `.setLoop(THREE.LoopOnce, 1)`.
+I know that I can have an animation play backwards by using `.setEffectiveTimeScale(-1)`.
+
+
+**Do I actually know below? I haven't experimented with that yet**
+- [ ] I assume that if I have multiple animations to get through, I can have the mixer finished listener to call play on the next
+- [ ] I assume that if I want to get through multiple animations in the same timeframe as 1, I can decrease all of their timescales appropriately to get through all of them to the right total time.
+
 ## Chaining multiple animations together
 ```js
 const action1 = mixer.clipAction(c2.toNextClip)
@@ -252,6 +263,10 @@ Finished
   type: "finished"
 }
 ```
+
+This is good, but there's no data about what the action was except for the clip name. I could
+- drive the find of the next clip off the current clip name
+- Extend AnimationAction to include a field for the next AnimationAction to be played.
 
 ## Going in reverse
 `action.setEffectiveTimescale(-1)` seems to play animations in reverse
