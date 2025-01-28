@@ -162,18 +162,18 @@ const Scene = () => {
     let found = false
     let followRight = false
     let followLeft = false
-    let rightMost = currentSceneTarget.current
-    let leftMost = currentSceneTarget.current
+    let rightMost = currentSceneTarget.current // .next ??? why not, try when have tests
+    let leftMost = currentSceneTarget.current  // .prev ??? see above
     while (!found) {
 
 
-      if (rightMost === target) {
+      if (rightMost.name === target.name) {
         followRight = true
         found = true
         break
       }
 
-      if (leftMost === target && !found) {
+      if (leftMost.name === target.name && !found) {
         followLeft = true
         found = true
         break
@@ -186,19 +186,25 @@ const Scene = () => {
     let actions = []
     let current = currentSceneTarget.current
     if (followRight) {
-      while (current !== target) {
-        actions.push(mixer.clipAction(current.toNextClip))
+      while (current.name !== target.name) {
+        let action = mixer.clipAction(current.toNextClip)
+                          .setLoop(THREE.LoopOnce, 1)
+        actions.push(action)
         current = current.next
       }
     } else {
-      while (current !== target) {
+      while (current.name !== target.name) {
         let action = mixer.clipAction(current.toPrevClip)
-        action.timeScale = -1
-        action.setLoop(THREE.LoopOnce) 
+                          .setEffectiveTimeScale(-1)
+                          .setLoop(THREE.LoopOnce, 1)
         actions.push(action)
         current = current.prev
       }
     }
+
+    actions[actions.length - 1].clampWhenFinished = true
+
+    return actions
   }
 
   // Create AnimationActions for each transition information
