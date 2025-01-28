@@ -209,9 +209,11 @@ I found that if I animate my own camera object, then copy those properties to th
 # Remaining features
 - [ ] Sub sections controlled by "Right"/"Left" buttons, alternatively swipes on mobile
 - [ ] Sections controlled by button click
-- [ ] Sections can be visited out of order by playing the shortest path animation
-- [ ] If a user wants to go to a different section/subsection in the middle of an animation, the animation is interrupted by starting to find the shortest path animation to their destination
-- [ ] Pyramid smoothly animates to cubes rather than going all the way around.
+- [ ] ~~Sections can be visited out of order by playing the shortest path animation~~
+- [ ] ~~If a user wants to go to a different section/subsection in the middle of an animation, the animation is interrupted by starting to find the shortest path animation to their destination~~
+- [ ] ~~Pyramid smoothly animates to cubes rather than going all the way around.~~
+
+Took out the striked animations so I can roll back the scope creep.
 
 # The need for a module to manage a structure of AnimationActions
 Vision of a data structure to hold these animation actions and allow for seamless traversal is taking shape. 

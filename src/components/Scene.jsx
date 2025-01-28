@@ -83,7 +83,7 @@ const Scene = () => {
       this.next = null
       this.prev = null
       this.toNextClip = null
-      this.toPrevClip = null // Note prev clips need to be reversed
+      this.toPrevClip = null // Note prev clips need to be reversed, TODO: Make these actions and set the timeScale to -1
     }
   }
 
@@ -157,49 +157,13 @@ const Scene = () => {
 
   // TODO, create a function that will find the path to the next target given the requested target and the current target
   function findAnimPath(target) {
-    // Return a  list of AnimationActions?
-    // target is desired. Use currentSceneTarget.current as the current target
-    let found = false
-    let followRight = false
-    let followLeft = false
-    let rightMost = currentSceneTarget.current // .next ??? why not, try when have tests
-    let leftMost = currentSceneTarget.current  // .prev ??? see above
-    while (!found) {
-
-
-      if (rightMost.name === target.name) {
-        followRight = true
-        found = true
-        break
-      }
-
-      if (leftMost.name === target.name && !found) {
-        followLeft = true
-        found = true
-        break
-      } 
-
-      rightMost = rightMost.next
-      leftMost = leftMost.prev
-    }
-
     let actions = []
     let current = currentSceneTarget.current
-    if (followRight) {
-      while (current.name !== target.name) {
-        let action = mixer.clipAction(current.toNextClip)
-                          .setLoop(THREE.LoopOnce, 1)
-        actions.push(action)
-        current = current.next
-      }
-    } else {
-      while (current.name !== target.name) {
-        let action = mixer.clipAction(current.toPrevClip)
-                          .setEffectiveTimeScale(-1)
-                          .setLoop(THREE.LoopOnce, 1)
-        actions.push(action)
-        current = current.prev
-      }
+    while (current.name !== target.name) {
+      let action = mixer.clipAction(current.toNextClip)
+                        .setLoop(THREE.LoopOnce, 1)
+      actions.push(action)
+      current = current.next
     }
 
     actions[actions.length - 1].clampWhenFinished = true
@@ -207,36 +171,41 @@ const Scene = () => {
     return actions
   }
 
-  // Create AnimationActions for each transition information
-  const c1ToS1Action = mixer.clipAction(c1ToS1)
-  c1ToS1Action.clampWhenFinished = true
-  const s1ToP1Action = mixer.clipAction(s1ToP1)
-  s1ToP1Action.clampWhenFinished = true
-     
   /**
    * Will have a list of time values for each model to be viewed.
    * When a primary button is presed, the animation will reverse or advance to the appropriate time value, whichever is more appropriate. (Still haven't figured out how to get the animation to be a cycle)
    * When the next button is pressed, the animation will advance 1 second.
    * When the back button is pressed, tha animation will retreat 1 second.
    */
-  const previousActiveButton = useRef(null)
-  const stopTime = useRef(0)
-  const go = useRef(false)
+  const actions = useRef([])
+  mixer.addEventListener("finished", (e) => { 
+    if (actions.current.length > 0) {
+      actions.current.shift().play() 
+    }
+  })
+
+  const previousActiveButton = useRef("cube")
   useEffect(() => {
     // The behavior I'm looking for: https://codepen.io/GreenSock/pen/bGexQpq
     if (cube_button_active && previousActiveButton.current !== "cube") {
 
+      actions.current = findAnimPath(c1)
+      currentSceneTarget.current = c1 // TODO Won't work for all use cases. What happens if the user wants to go to a different section in the middle of the animation?
+      actions.current.shift().play()
       previousActiveButton.current = "cube"
 
     } else if (sphere_button_active && previousActiveButton.current !== "sphere") {
 
-      const action = mixer.clipAction()
-      c1ToS1Action.setLoop(THREE.LoopOnce, 0).play()
+      actions.current = findAnimPath(s1)
+      currentSceneTarget.current = s1 // TODO See above
+      actions.current.shift().play()
       previousActiveButton.current = "sphere"
 
     } else if (pyramid_button_active && previousActiveButton.current !== "pyramid") {
 
-      s1ToP1Action.setLoop(THREE.LoopOnce, 0).play()
+      actions.current = findAnimPath(p1)
+      currentSceneTarget.current = p1 // TODO See above
+      actions.current.shift().play()
       previousActiveButton.current = "pyramid"
 
     }
