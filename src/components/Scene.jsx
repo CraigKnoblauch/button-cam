@@ -180,6 +180,7 @@ const Scene = () => {
   const actions = useRef([])
   mixer.addEventListener("finished", (e) => { 
     if (actions.current.length > 0) {
+      mixer.stopAllAction() // NOTE: Stopping actions seems to solve the frame jump problem I saw. I think that was caused by an animation repeating out of sync with the threejs render loop
       actions.current.shift().play() 
     }
   })
