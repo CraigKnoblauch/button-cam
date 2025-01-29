@@ -281,3 +281,15 @@ Keeping here for future notes. You can use the same css styling as the rest of t
 </Html>
 ```
 
+# Testing
+Installed vitest, browser, and configured with 
+```
+npx vitest init browser
+```
+
+Copied over my vite config file from my portfolio, removing the glsl plugin
+
+Also ran
+```
+npm install @react-three/test-renderer @testing-library/react
+```
