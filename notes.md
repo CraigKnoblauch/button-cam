@@ -273,3 +273,11 @@ This is good, but there's no data about what the action was except for the clip 
 ## Going in reverse
 `action.setEffectiveTimescale(-1)` seems to play animations in reverse
 
+# Drei Html component
+Keeping here for future notes. You can use the same css styling as the rest of the project, and it's positioned __in the canvas__. It literally looks like it attaches to the world position.
+```js
+<Html>
+  <button id="Left" className="relative hover:bg-blue-500 p-2 rounded-lg" onClick={() => console.log("click")}>Next</button>
+</Html>
+```
+

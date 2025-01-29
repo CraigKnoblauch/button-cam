@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import { useButtonStore } from 'src/stores/ButtonStore'
 import { Canvas } from '@react-three/fiber'
 // import { OrbitControls } from '@react-three/drei'
@@ -5,6 +6,8 @@ import Scene from 'src/components/Scene'
 // import './App.css'
 
 function App() {
+
+  const sceneRef = useRef()
   
   const { 
     cube_button_active, sphere_button_active, pyramid_button_active, 
@@ -41,8 +44,8 @@ function App() {
             >
               Pyramids
             </button>
-            <button id="Left" className="hover:bg-blue-500 p-2 rounded-lg">Next</button>
-            <button id="Right" className="hover:bg-blue-500 p-2 rounded-lg">Back</button>
+            <button id="Left" className="hover:bg-blue-500 p-2 rounded-lg" onClick={() => sceneRef.current?.onNext()}>Next</button>
+            <button id="Right" className="hover:bg-blue-500 p-2 rounded-lg" onClick={() => sceneRef.current?.onBack()}>Back</button>
           </div>
 
           <div id="dot_stack" className="absolute z-20 top-0 right-0 h-screen flex flex-col justify-center items-center p-4">
@@ -70,7 +73,7 @@ function App() {
             {/* NOTE Disabling OrbitControls means the animation mixer in Scene no longer animates the scene camera. No idea why but it's a very real side effect */}
             {/* <OrbitControls enableZoom={false}/> */}
             <ambientLight/>
-            <Scene/>
+            <Scene ref={sceneRef} />
           </Canvas>
         </div>
       </div>

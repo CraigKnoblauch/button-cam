@@ -1,4 +1,4 @@
-import { useGLTF } from "@react-three/drei";
+import { useGLTF, Html } from "@react-three/drei";
 import * as THREE from "three";
 import { useButtonStore } from "src/stores/ButtonStore";
 import { useFrame, useThree } from "@react-three/fiber";
@@ -7,15 +7,17 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import { MotionPathPlugin } from "gsap/src/all";
+import { forwardRef, useImperativeHandle } from "react";
 // https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollToPlugin.min.js
 
-const Scene = () => {
+const Scene = forwardRef((props, ref) => {
 
   gsap.registerPlugin(MotionPathPlugin)
 
   const { 
     cube_button_active, sphere_button_active, pyramid_button_active,
-    setCubeButton, setSphereButton, setPyramidButton
+    setCubeButton, setSphereButton, setPyramidButton,
+    setOnNextAction
   } = useButtonStore()
 
   const { scene, animations } = useGLTF("./models/scene-with-multiple-animations.glb");
@@ -182,27 +184,29 @@ const Scene = () => {
     if (actions.current.length > 0) {
       mixer.stopAllAction() // NOTE: Stopping actions seems to solve the frame jump problem I saw. I think that was caused by an animation repeating out of sync with the threejs render loop
       actions.current.shift().play() 
+    } else {
+      // mixer.uncacheRoot(mixer.getRoot())
     }
   })
 
   const previousActiveButton = useRef("cube")
   useEffect(() => {
     // The behavior I'm looking for: https://codepen.io/GreenSock/pen/bGexQpq
-    if (cube_button_active && previousActiveButton.current !== "cube") {
+    if (cube_button_active && previousActiveButton.current !== "cube" && currentSceneTarget.current.name !== c1.name) {
 
       actions.current = findAnimPath(c1)
       currentSceneTarget.current = c1 // TODO Won't work for all use cases. What happens if the user wants to go to a different section in the middle of the animation?
       actions.current.shift().play()
       previousActiveButton.current = "cube"
 
-    } else if (sphere_button_active && previousActiveButton.current !== "sphere") {
+    } else if (sphere_button_active && previousActiveButton.current !== "sphere" && currentSceneTarget.current.name !== s1.name) {
 
       actions.current = findAnimPath(s1)
       currentSceneTarget.current = s1 // TODO See above
       actions.current.shift().play()
       previousActiveButton.current = "sphere"
 
-    } else if (pyramid_button_active && previousActiveButton.current !== "pyramid") {
+    } else if (pyramid_button_active && previousActiveButton.current !== "pyramid" && currentSceneTarget.current.name !== p1.name) {
 
       actions.current = findAnimPath(p1)
       currentSceneTarget.current = p1 // TODO See above
@@ -211,6 +215,22 @@ const Scene = () => {
 
     }
   }, [cube_button_active, sphere_button_active, pyramid_button_active])
+
+  // ChildComponent.js
+  useImperativeHandle(ref, () => ({
+    onNext: () => {
+      actions.current = findAnimPath(currentSceneTarget.current.next)
+      currentSceneTarget.current = currentSceneTarget.current.next
+      actions.current.shift().play()
+    },
+
+    onBack: () => {
+      actions.current = [mixer.clipAction(currentSceneTarget.current.toPrevClip).setLoop(THREE.LoopOnce, 0).setEffectiveTimeScale(-1)]
+      actions.current[0].clampWhenFinished = true
+      currentSceneTarget.current = currentSceneTarget.current.prev
+      actions.current.shift().play()
+    }
+  }))
 
   useFrame((state, delta) => {
 
@@ -234,7 +254,7 @@ const Scene = () => {
     <primitive object={p2Mesh} ref={p2MeshRef} material={new THREE.MeshStandardMaterial({ color: 0x0000ff })}/>
     <primitive object={p3Mesh} ref={p3MeshRef} material={new THREE.MeshStandardMaterial({ color: 0x0000ff })}/>
   </>
-}
+})
 
 export default Scene
 
